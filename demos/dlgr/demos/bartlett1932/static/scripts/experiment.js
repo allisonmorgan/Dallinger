@@ -48,15 +48,42 @@ var create_agent = function() {
     });
 };
 
+// var get_info = function() {
+//   // Get info for node
+//   dallinger.getReceivedInfos(my_node_id)
+//     .done(function (resp) {
+//       var story = resp.infos[0].contents;
+//       var storyHTML = markdown.toHTML(story);
+//       $("#story").html(storyHTML);
+//       $("#stimulus").show();
+//       $("#response-form").hide();
+//       $("#finish-reading").show();
+//     })
+//     .fail(function (rejection) {
+//       console.log(rejection);
+//       $('body').html(rejection.html);
+//     });
+// };
+
 var get_info = function() {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
-      var story = resp.infos[0].contents;
-      var storyHTML = markdown.toHTML(story);
-      $("#story").html(storyHTML);
-      $("#stimulus").show();
+      var story = resp.infos;
+      var story_one = story[0].contents;
+      var story_two = story[1].contents;
+      console.log(resp);
+
+      var storyHTML = markdown.toHTML(story_one);
+      $("#story").html(storyHTML); // Story #1
+      $("#stimulus_one").show();
       $("#response-form").hide();
+
+      var storyHTML = markdown.toHTML(story_two);
+      $("#story").html(storyHTML); // Story #2
+      $("#stimulus_two").show();
+      $("#response-form").hide();
+
       $("#finish-reading").show();
     })
     .fail(function (rejection) {
