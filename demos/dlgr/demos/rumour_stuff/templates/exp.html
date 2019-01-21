@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="main_div">
+        <div id="stimulus_one">
+            <h1>Read the following text:</h1>
+            <div><blockquote id="story_one"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>
+            <button id="finish-reading_one" type="button" class="btn btn-primary">I'm done reading the first story.</button>
+        </div>
+
+        <div id="stimulus_two" style="display:none;">
+            <h1>Read the following text:</h1>
+            <div><blockquote id="story_two"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>
+            <button id="finish-reading_two" type="button" class="btn btn-primary">I'm done reading the second story.</button>
+        </div>
+
+        <div id="response-form" style="display:none;">
+            <h1>Now reproduce the passage, verbatim:</h1>
+            <p><b>Note:</b> Your task is to recreate the text, word for word, to the best of your ability.<p>
+            <textarea id="reproduction" class="form-control" rows="10"></textarea>
+            <p></p>
+            <button id="submit-response" type="button" class="btn btn-primary">Submit response.</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        create_agent();
+    </script>
+{% endblock %}

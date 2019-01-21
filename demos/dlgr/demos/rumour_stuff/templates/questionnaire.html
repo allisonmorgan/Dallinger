@@ -1,0 +1,80 @@
+{% extends "base/questionnaire.html" %}
+
+{% block questions %}
+	                
+<div class="row question">
+    <div class="col-md-8">
+        Is English your mother tongue?
+    </div>
+    <div class="col-md-4">
+        <select id="engagement" name="language">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+    </div>
+</div>  
+
+<div class="row question">
+    <div class="col-md-8">
+        What is the highest grade or level of school received?
+    </div>
+    <div class="col-md-4">
+        <select id="engagement" name="education">
+            <option value="8">Doctoral or equivalent level</option>
+            <option value="7">Master’s or equivalent level</option>
+            <option value="6">Bachelor’s or equivalent level</option>
+            <option value="5">Short-cycle tertiary education</option>
+            <option value="4">Post-secondary non-tertiary education</option>
+            <option value="3">Upper secondary education</option>
+            <option value="2">Lower secondary education</option>
+            <option value="1">Primary education</option>
+            <option value="0">Less than primary education</option>
+
+
+
+        </select>
+    </div>
+</div>  
+
+
+<div class="row question">
+    <div class="col-md-8">
+        What is your age range?
+    </div>
+    <div class="col-md-4">
+        <select id="engagement" name="age">
+            <option value="0">18-25</option>
+            <option value="1">25-35</option>
+            <option value="2">35-55</option>
+            <option value="3">over 55</option>
+            
+        </select>
+    </div>
+</div>  
+
+<div class="row question">
+    <div class="col-md-8">
+Where would you place YOURSELF on a scale from 0 to 10 where 10 means very liberal and 0 means
+very conservative?
+
+    </div>
+    <div class="col-md-4">
+        <select id="engagement" name="ideology">
+            <option value="10">[10] Very liberal</option>
+            <option value="9">9</option>
+            <option value="8">8</option>
+            <option value="7">7</option>
+            <option value="6">6</option>
+            <option value="5">5 Moderate</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+            <option value="0">[10] Very conservative</option>
+            
+        </select>
+    </div>
+</div>  
+
+
+{% endblock %}
