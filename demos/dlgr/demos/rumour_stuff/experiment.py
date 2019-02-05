@@ -48,7 +48,7 @@ class Bartlett1932(Experiment):
 
     def create_network(self):
         """Return a new network."""
-        return Chain(max_size=5)
+        return MultiChain(5,3,True)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
