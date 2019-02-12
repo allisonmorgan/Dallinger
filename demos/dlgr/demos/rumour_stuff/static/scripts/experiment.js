@@ -60,8 +60,11 @@ var get_info = function() {
     .done(function (resp) {
       var story = resp.infos;
       var story_one = story[0].contents;
-      // for now we show the same twice to avoid errors, but the line should be story[1].contents;
-      var story_two = story[0].contents;
+      if(story.length > 1) {
+        var story_two = story[1].contents; //TODO need to test this --- make sure right number of Infos being received
+      } else{
+        var story_two = story[0].contents
+      }
 
       var storyHTML = markdown.toHTML(story_one);
       $("#story_one").html(storyHTML); // Story #1
@@ -74,7 +77,7 @@ var get_info = function() {
       $("#finish-reading_two").show();
 
       $("#response-form").hide();
-      
+
     })
     .fail(function (rejection) {
       console.log(rejection);

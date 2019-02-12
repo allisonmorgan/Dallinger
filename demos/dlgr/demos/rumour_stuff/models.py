@@ -1,4 +1,12 @@
-from dallinger.nodes import Source
+
+from operator import attrgetter
+
+from sqlalchemy import Float, Integer
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql.expression import cast
+
+from dallinger.nodes import Source, Agent
+from dallinger.networks import Network
 import random
 
 
@@ -27,6 +35,27 @@ class WarOfTheGhostsSource(Source):
         story = random.choice(stories)
         with open("static/stimuli/{}".format(story), "r") as f:
             return f.read()
+
+class RogersAgent(Agent):
+    """The Rogers Agent."""
+
+    __mapper_args__ = {"polymorphic_identity": "rogers_agent"}
+
+    @hybrid_property
+    def generation(self):
+        """Convert property2 to genertion."""
+        return int(self.property2)
+
+    @generation.setter
+    def generation(self, generation):
+        """Make generation settable."""
+        self.property2 = repr(generation)
+
+    @generation.expression
+    def generation(self):
+        """Make generation queryable."""
+        return cast(self.property2, Integer)
+
 
 class MultiChain(Network):
     """A multi-chained network
@@ -76,7 +105,7 @@ class MultiChain(Network):
 
         if len(parents) > 0:
 
-	        for p in parents:
+            for p in parents:
                 p.connect(whom=node)
                 p.transmit(to_whom=node)
 

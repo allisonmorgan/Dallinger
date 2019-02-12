@@ -7,8 +7,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from models import RogersAgent, MultiChain
 from dallinger.bots import BotBase
-from dallinger.networks import Chain
 from dallinger.experiment import Experiment
 
 
@@ -30,6 +30,8 @@ class Bartlett1932(Experiment):
         self.models = models
         self.experiment_repeats = 1
         self.initial_recruitment_size = 1
+        self.generation_size = 2
+        self.generations = 5
         if session:
             self.setup()
 
@@ -47,8 +49,40 @@ class Bartlett1932(Experiment):
                 self.models.WarOfTheGhostsSource(network=net)
 
     def create_network(self):
-        """Return a new network."""
-        return MultiChain(5,3,True)
+        """Create a new network."""
+        return MultiChain(
+            generations=self.generations,
+            generation_size=self.generation_size,
+            initial_source=True
+        )
+
+    def create_node(self, network, participant):
+        """Make a new node for participants."""
+        return self.models.RogersAgent(network=network,participant=participant)
+
+    def add_node_to_network(self, node, network):
+        """Add participant's node to a network."""
+        network.add_node(node)
+        node.receive()
+
+        #environment = network.nodes(type=Environment)[0]
+        #environment.connect(whom=node)
+        #environment.transmit(to_whom=node)
+
+        #if node.generation > 0:
+        #    agent_model = self.models.RogersAgent
+        #    prev_agents = agent_model.query\
+        #        .filter_by(failed=False,
+        #                   network_id=network.id,
+        #                   generation=node.generation - 1)\
+        #        .all()
+        #    parent = random.choice(prev_agents)
+        #    parent.connect(whom=node) # TODO: DiscreteGenerational network also connects nodes. why doesn't this line create a second vector in the database?
+        #    parent.transmit(what=Meme, to_whom=node)
+
+        #node.receive()
+
+
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
