@@ -10,6 +10,11 @@ $(document).ready(function() {
 
   $("#finish-reading_two").click(function() {
     $("#stimulus_two").hide();
+    $("#intermediary_task").show();
+  });
+
+  $("#task-completed").click(function() {
+    $("#intermediary_task").hide();
     $("#response-form").show();
     $("#submit-response").removeClass('disabled');
     $("#submit-response").html('Submit');
