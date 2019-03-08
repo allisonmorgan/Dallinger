@@ -10,6 +10,7 @@ from dallinger.networks import Network
 import random
 
 
+# TODO: if we want to show different stories across networks, we have to make fancier changes 
 class WarOfTheGhostsSource(Source):
     """A Source that reads in a random story from a file and transmits it."""
 
