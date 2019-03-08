@@ -24,6 +24,7 @@ class WarOfTheGhostsSource(Source):
             "tennis.md",
             "vagabond.md"
         ]
-        story = random.choice(stories)
+        # story = random.choice(stories)
+        story = stories[0]
         with open("static/stimuli/{}".format(story), "r") as f:
             return f.read()
