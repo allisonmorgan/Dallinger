@@ -60,10 +60,10 @@ class Bartlett1932(Experiment):
         """Make a new node for participants."""
         return self.models.RogersAgent(network=network,participant=participant)
 
-    def add_node_to_network(self, node, network):
-        """Add participant's node to a network."""
-        network.add_node(node)
-        node.receive()
+    #def add_node_to_network(self, node, network):
+    #    """Add participant's node to a network."""
+    #    network.add_node(node)
+    #    node.receive()
 
         #environment = network.nodes(type=Environment)[0]
         #environment.connect(whom=node)
