@@ -23,17 +23,7 @@ class WarOfTheGhostsSource(Source):
 
         transmit() -> _what() -> create_information() -> _contents().
         """
-        stories = [
-            "ghosts.md",
-            "cricket.md",
-            "moochi.md",
-            "outwit.md",
-            "raid.md",
-            "species.md",
-            "tennis.md",
-            "vagabond.md"
-        ]
-        story = random.choice(stories)
+        story = "superbugs.md"
         with open("static/stimuli/{}".format(story), "r") as f:
             return f.read()
 
