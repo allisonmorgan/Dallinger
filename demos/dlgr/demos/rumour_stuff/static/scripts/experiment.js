@@ -6,6 +6,7 @@ $(document).ready(function() {
   $("#finish-reading_one").click(function() {
     $("#stimulus_one").hide();
     $("#stimulus_two").show();
+    $(window).scrollTop(0);
   });
 
   $("#finish-reading_two").click(function() {
