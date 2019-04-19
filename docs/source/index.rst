@@ -19,7 +19,6 @@ and setting up Dallinger, as well as use of the command line tools.
     :maxdepth: 1
 
     installing_dallinger_for_users
-    dallinger_with_anaconda
     aws_etc_keys
     demoing_dallinger
     command_line_utility
@@ -33,6 +32,20 @@ and setting up Dallinger, as well as use of the command line tools.
     registration_on_OSF
     troubleshooting
 
+Beginner Documentation
+^^^^^^^^^^^^^^^^^^^^^^
+
+Many Dallinger users may not have lots of programming experience, and might
+want a bit more information about the inner workings of Dallinger in a
+beginner-friendly format. Thomas Morgan has started such a project:
+"Dallinger for Programming Novices". Every Dallinger user is encouraged to take a look at this guide, which is a
+nice complement to the documentation presented here.
+
+.. toctree::
+    :caption: Beginner Documentation
+    :maxdepth: 1
+
+    Dallinger for Programming Novices <https://github.com/thomasmorgan/dallinger-for-novices>
 
 Dallinger Demos
 ^^^^^^^^^^^^^^^
@@ -58,6 +71,7 @@ designing new experiments for others to use.
 
     developing_dallinger_setup_guide
     creating_an_experiment
+    networks
     docker_setup
     the_experiment_class
     classes
@@ -68,6 +82,7 @@ designing new experiments for others to use.
     waiting_rooms
     writing_bots
     extra_configuration
+    recruitment
 
 Core Contribution Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

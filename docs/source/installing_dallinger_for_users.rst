@@ -8,15 +8,19 @@ instructions <developing_dallinger_setup_guide>`.
 Installation Options
 --------------------
 
-Dallinger is tested with Ubuntu 14.04 LTS, 16.04 LTS, 18.04 LTS and Mac OS X locally.
-We do not recommended running Dallinger with Microsoft Windows, however if you do, running Ubuntu in a virtual machine is the recommend method. You can also read about what is possible with using Dallinger with Docker :doc:`here<docker_setup>`.
+Dallinger is tested with Ubuntu 18.04 LTS, 16.04 LTS, 14.04 LTS and Mac OS X locally.
+We do not recommended running Dallinger with Microsoft Windows, however if you do, running Ubuntu in a virtual machine is the recommend method.
 
 Using Dallinger with Docker
 ---------------------------
 Docker is a containerization tool used for developing isolated software environments. Read more about using Dallinger with Docker :doc:`here<docker_setup>`.
 
+
+Mac OS X
+--------
+
 Install Python
---------------
+~~~~~~~~~~~~~~
 
 Dallinger is written in the language Python. For it to work, you will need
 to have Python 2.7 installed, or alternatively Python 3.6 or higher. Python 3 is the preferred option.
@@ -26,10 +30,10 @@ You can check what version of Python you have by running:
     python --version
 
 
-You will also need to have `pip <https://pip.pypa.io/en/stable>`__ installed. It is included in some of the later versions of Python 3, but not all. (pip is a package manager for Python packages, or modules if you like.)
+.. note::
 
-Mac OS X
-~~~~~~~~
+    You will also need to have `pip <https://pip.pypa.io/en/stable>`__ installed. It is included in some of the later versions of Python 3, but not all. (pip is a package manager for Python packages, or modules if you like.) If you are using Python 3, you may find that you may need to use the ``pip3`` command instead of ``pip`` where applicable in the instructions that follow.
+
 
 Using Homebrew will install the latest version of Python and pip by default.
 
@@ -55,47 +59,8 @@ With the preinstalled Python in Mac OS X, you will need to install pip yourself.
 Should that not work for whatever reason, you can search `here <https://docs.python-guide.org/>`__ for more clues.
 
 
-Ubuntu
-~~~~~~
-
-Ubuntu 18.04 LTS ships with Python 3.6.
-
-Ubuntu 16.04 LTS ships with Python 3.5, while Ubuntu 14.04 LTS ships with Python 3.4. In case you are using these distribution of Ubuntu, you can use
-dallinger with Python 2.7 or upgrade to the latest Python 3.x on your own.
-
-(All three of these Ubuntu versions also provide a version of Python 2.7)
-
-If you do not have Python 3 installed, you can install it from the
-`Python website <https://www.python.org/downloads/>`__.
-
-Also make sure you have the python headers installed. The python-dev package
-contains the header files you need to build Python extensions appropriate to the Python version you will be using.
-You will also need to install pip.
-
-If using Python 2.7.x:
-::
-
-    sudo apt-get install python-dev
-    sudo apt install -y python-pip
-
-If using Python 3.x:
-::
-
-    sudo apt-get install python3-dev
-    sudo apt install -y python3-pip
-
-
-Anaconda
-~~~~~~~~
-::
-
-    conda install python
-
 Install Postgresql
-------------------
-
-Mac OS X
-~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 On Mac OS X, we recommend installing using Homebrew:
 ::
@@ -110,81 +75,8 @@ Postgresql can then be started and stopped using:
     brew services stop postgresql
 
 
-Ubuntu
-~~~~~~
-
-The lowest version of Postgresql that Dallinger v5 supports is 9.4.
-
-This is fine for Ubuntu 18.04 LTS and 16.04 LTS as they
-ship with Postgresql 10.4 and 9.5 respectively, however Ubuntu 14.04 LTS ships with Postgresql 9.3
-
-Postgres can be installed using the following instructions:
-
-**Ubuntu 18.04 LTS:**
-::
-
-    sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib
-
-To run postgres, use the following command:
-::
-
-    sudo service postgresql start
-
-After that you'll need to run the following commands
-::
-
-    sudo sed /etc/postgresql/10/main/pg_hba.conf -e 's/md5/trust/g' --in-place
-    sudo sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i '/etc/postgresql/10/main/postgresql.conf'
-    sudo service postgresql reload
-
-**Ubuntu 16.04 LTS:**
-::
-
-    sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib
-
-To run postgres, use the following command:
-::
-
-    service postgresql start
-
-After that you'll need to run the following commands
-::
-
-    sudo sed /etc/postgresql/9.5/main/pg_hba.conf -e 's/md5/trust/g' --in-place
-    sudo sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i '/etc/postgresql/9.5/main/postgresql.conf'
-    sudo service postgresql reload
-
-**Ubuntu 14.04 LTS:**
-
-Create the file /etc/apt/sources.list.d/pgdg.list and add a line for the repository:
-::
-
-    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
-
-Import the repository signing key, update the package lists and install postgresql:
-::
-
-    wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
-    sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib
-
-To run postgres, use the following command:
-::
-
-    sudo service postgresql start
-
-After that you'll need to run the following commands
-::
-
-    sudo sed /etc/postgresql/10/main/pg_hba.conf -e 's/md5/trust/g' --in-place
-    sudo sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i '/etc/postgresql/10/main/postgresql.conf'
-    sudo service postgresql reload
-
-
 Create the databases
---------------------
-
-Mac OS X
-~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 After installing Postgres, you will need to create two databases:
 one for your experiments to use, and a second to support importing saved
@@ -225,37 +117,8 @@ If you get an error like the following:
 
 then postgres is not running. Start postgres as described in the Install Postgresql section above.
 
-Ubuntu
-~~~~~~
-
-Make sure that postgres is running. Switch to the postgres user:
-
-::
-
-    sudo -u postgres -i
-
-Run the following commands:
-
-::
-
-    createuser -P dallinger --createdb
-    (Password: dallinger)
-    createdb -O dallinger dallinger
-    createdb -O dallinger dallinger-import
-    exit
-
-The second command will create a user named ``dallinger`` and prompt you for a
-password. The third and fourth commands will create the ``dallinger`` and ``dallinger-import`` databases, setting
-the newly created user as the owner.
-
-Finally restart postgresql:
-::
-
-    sudo service postgresql reload
-
-
 Install Heroku
---------------
+~~~~~~~~~~~~~~
 
 To run experiments locally or on the internet, you will need the Heroku Command
 Line Interface installed, version 3.28.0 or better. If you want to launch experiments on the internet, then
@@ -266,17 +129,20 @@ To check which version of the Heroku CLI you have installed, run:
 
     heroku --version
 
-The Heroku CLI is available for download from
-`heroku.com <https://devcenter.heroku.com/articles/heroku-cli>`__.
+
+To install:
+::
+
+    brew install heroku/brew/heroku
+
+More information on the Heroku CLI is available at `heroku.com <https://devcenter.heroku.com/articles/heroku-cli>`__ along with alternative installation instructions, if needed.
+
 
 Install Redis
--------------
+~~~~~~~~~~~~~
 
 Debugging experiments requires you to have Redis installed and the Redis
 server running.
-
-Mac OS X
-~~~~~~~~
 ::
 
     brew install redis
@@ -286,49 +152,33 @@ Start Redis on Mac OS X with:
 
     brew services start redis
 
-Ubuntu
-~~~~~~
-::
-
-    sudo apt-get install -y redis-server
-
-Start Redis on Ubuntu with:
-::
-
-    sudo service redis-server start
-
 You can find more details and other installation instructions at `redis.com <https://redis.io/topics/quickstart>`__.
 
-
-
 Install Git
------------
+~~~~~~~~~~~
 
 Dallinger uses Git, a distributed version control system, for version control of its code.
 If you do not have it installed, you can install it as follows:
 
-Mac OS X
-~~~~~~~~
 ::
 
     brew install git
 
-Ubuntu
-~~~~~~
+
+You will need to configure your Git name and email:
+
 ::
 
-    sudo apt install git
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+
+Replace ``you@example.com`` and ``Your Name`` with your email and name to set your account's default identity.
+Omit --global to set the identity only in this repository. You can read more about configuring Git `here <https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup/>`__.
 
 
 Set up a virtual environment
-----------------------------
-
-.. note::
-
-    If you are using Anaconda, ignore this virtualenv
-    section; use ``conda`` to create your virtual environment. Or, see the
-    special :doc:`Anaconda installation instructions <dallinger_with_anaconda>`.
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Why use virtualenv?
 
@@ -337,9 +187,6 @@ that have different (and often conflicting) requirements, to coexist on the same
 If you want to understand this in detail, you can read more about it `here <https://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/>`__.
 
 Now let's set up a virtual environment by running the following commands:
-
-Mac OS X
-~~~~~~~~
 
 If using Python 2.7 and pip:
 ::
@@ -386,7 +233,7 @@ Using Python 2.7:
     mkvirtualenv dlgr_env --python /usr/bin/python
 
 
-Virtualenvwrapper provides an easy way to switch between virtual environments 
+Virtualenvwrapper provides an easy way to switch between virtual environments
 by simply typing: ``workon [virtual environment name]``.
 
 The technical details:
@@ -449,19 +296,238 @@ Python 3.x
 
 From then on, you only need to use the ``workon`` command before starting.
 
+Install Dallinger
+~~~~~~~~~~~~~~~~~
+
+Install Dallinger from the terminal by running
+::
+
+    pip install dallinger[data]
+
+Test that your installation works by running:
+::
+
+    dallinger --version
+
+
+Next, you'll need :doc:`access keys for AWS, Heroku,
+etc. <aws_etc_keys>`.
+
+
 Ubuntu
-~~~~~~
+------
+
+Install Python
+~~~~~~~~~~~~~~
+
+Dallinger is written in the language Python. For it to work, you will need
+to have Python 2.7 installed, or alternatively Python 3.6 or higher. Python 3 is the preferred option.
+You can check what version of Python you have by running:
+::
+
+    python --version
+
+
+Ubuntu 18.04 LTS ships with Python 3.6.
+
+Ubuntu 16.04 LTS ships with Python 3.5, while Ubuntu 14.04 LTS ships with Python 3.4. In case you are using one of these distributions of Ubuntu, you can use Dallinger with Python 2.7 or upgrade to the latest Python 3.x on your own.
+
+(All three of these Ubuntu versions also provide a version of Python 2.7)
+
+If you do not have Python 3 installed, you can install it from the
+`Python website <https://www.python.org/downloads/>`__.
+
+Also make sure you have the python headers installed. The python-dev package
+contains the header files you need to build Python extensions appropriate to the Python version you will be using.
+
+.. note::
+
+    You will also need to have `pip <https://pip.pypa.io/en/stable>`__ installed.     It is included in some of the later versions of Python 3, but not all. (pip is a package manager for Python packages, or modules if you like.) If you are using Python 3, you may find that you may need to use the ``pip3`` command instead of ``pip`` where applicable in the instructions that follow.
+
+
+If using Python 2.7.x:
+::
+
+    sudo apt-get install python-dev
+    sudo apt install -y python-pip
+
+If using Python 3.x:
+::
+
+    sudo apt-get install python3-dev
+    sudo apt install -y python3-pip
+
+
+
+Install Postgresql
+~~~~~~~~~~~~~~~~~~
+
+The lowest version of Postgresql that Dallinger v5 supports is 9.4.
+
+This is fine for Ubuntu 18.04 LTS and 16.04 LTS as they
+ship with Postgresql 10.4 and 9.5 respectively, however Ubuntu 14.04 LTS ships with Postgresql 9.3
+
+Postgres can be installed using the following instructions:
+
+**Ubuntu 18.04 LTS** or **Ubuntu 16.04 LTS:**
+::
+
+    sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib libpq-dev
+
+To run postgres, use the following command:
+::
+
+    sudo service postgresql start
+
+
+**Ubuntu 14.04 LTS:**
+
+Create the file /etc/apt/sources.list.d/pgdg.list and add a line for the repository:
+::
+
+    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+
+Import the repository signing key, update the package lists and install postgresql:
+::
+
+    wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+    sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib
+
+To run postgres, use the following command:
+::
+
+    sudo service postgresql start
+
+
+Create the databases
+~~~~~~~~~~~~~~~~~~~~
+
+Make sure that postgres is running. Switch to the postgres user:
+
+::
+
+    sudo -u postgres -i
+
+Run the following commands:
+
+::
+
+    createuser -P dallinger --createdb
+    (Password: dallinger)
+    createdb -O dallinger dallinger
+    createdb -O dallinger dallinger-import
+    exit
+
+The second command will create a user named ``dallinger`` and prompt you for a
+password. The third and fourth commands will create the ``dallinger`` and ``dallinger-import`` databases, setting
+the newly created user as the owner.
+
+Finally restart postgresql:
+::
+
+    sudo service postgresql reload
+
+Install Heroku
+~~~~~~~~~~~~~~
+
+To run experiments locally or on the internet, you will need the Heroku Command
+Line Interface installed, version 3.28.0 or better. If you want to launch experiments on the internet, then
+you will also need a Heroku.com account, however this is not needed for local debugging.
+
+To check which version of the Heroku CLI you have installed, run:
+::
+
+    heroku --version
+
+
+To install:
+::
+
+    sudo apt-get install curl
+    curl https://cli-assets.heroku.com/install.sh | sh
+
+
+More information on the Heroku CLI is available at `heroku.com <https://devcenter.heroku.com/articles/heroku-cli>`__ along with alternative installation instructions, if needed.
+
+Install Redis
+~~~~~~~~~~~~~
+
+Debugging experiments requires you to have Redis installed and the Redis
+server running.
+
+::
+
+    sudo apt-get install -y redis-server
+
+Start Redis on Ubuntu with:
+::
+
+    sudo service redis-server start
+
+You can find more details and other installation instructions at `redis.com <https://redis.io/topics/quickstart>`__.
+
+Install Git
+~~~~~~~~~~~
+
+Dallinger uses Git, a distributed version control system, for version control of its code.
+If you do not have it installed, you can install it as follows:
+
+::
+
+    sudo apt install git
+
+
+You will need to configure your Git name and email:
+
+::
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+
+Replace ``you@example.com`` and ``Your Name`` with your email and name to set your account's default identity.
+Omit --global to set the identity only in this repository. You can read more about configuring Git `here <https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup/>`__.
+
+Set up a virtual environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Why use virtualenv?
+
+Virtualenv solves a very specific problem: it allows multiple Python projects
+that have different (and often conflicting) requirements, to coexist on the same computer.
+If you want to understand this in detail, you can read more about it `here <https://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/>`__.
+
+Now let's set up a virtual environment by running the following commands:
+
+If using Python 2.7 and pip:
 ::
 
     sudo pip install virtualenv
     sudo pip install virtualenvwrapper
     export WORKON_HOME=$HOME/.virtualenvs
     mkdir -p $WORKON_HOME
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+
+
+.. note::
+
+    If the last line failed with "No such file or directory". Try using ``source /usr/local/bin/virtualenvwrapper.sh`` instead. Pip installs `virtualenvwrapper.sh` to different locations depending on the Ubuntu version.
+
+
+If using Python 3.x and pip3:
+::
+
+    sudo pip3 install virtualenv
+    sudo pip3 install virtualenvwrapper
+    export WORKON_HOME=$HOME/.virtualenvs
+    mkdir -p $WORKON_HOME
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
     source /usr/local/bin/virtualenvwrapper.sh
+
 
 Now create the virtualenv using the ``mkvirtualenv`` command as follows:
 
-If you are using Python 3 that is part of your Ubuntu installation (16.04 or 18.04):
+If you are using Python 3 that is part of your Ubuntu installation (Ubuntu 18.04):
 ::
 
     mkvirtualenv dlgr_env --python /usr/bin/python3
@@ -471,14 +537,14 @@ If you are using Python 2 that is part of your Ubuntu installation:
 
     mkvirtualenv dlgr_env --python /usr/bin/python
 
-If you are using another Python version 
-(eg. custom installed Python 3.x on Ubuntu 14.04):
+If you are using another Python version
+(eg. custom installed Python 3.x on Ubuntu 16.04 or Ubuntu 14.04):
 ::
 
     mkvirtualenv dlgr_env --python <specify_your_python_path_here>
 
 
-Virtualenvwrapper provides an easy way to switch between virtual environments 
+Virtualenvwrapper provides an easy way to switch between virtual environments
 by simply typing: ``workon [virtual environment name]``.
 
 The technical details:
@@ -503,10 +569,19 @@ command inside the virtual environment.
 The how-to:
 
 In the future, you can work on your virtual environment by running:
+If using Python 2.7 and pip:
+::
+
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+    workon dlgr_env
+
+
+If using Python 3.x and pip3:
 ::
 
     source /usr/local/bin/virtualenvwrapper.sh
     workon dlgr_env
+
 
 NB: To stop working in the virtual environment, run ``deactivate``. To
 list all available virtual environments, run ``workon`` with no
@@ -515,16 +590,24 @@ arguments.
 If you plan to do a lot of work with Dallinger, you can make your shell
 execute the ``virtualenvwrapper.sh`` script everytime you open a terminal. To
 do that:
+
+If using Python 2.7 and pip:
+::
+
+    echo "source /usr/share/virtualenvwrapper/virtualenvwrapper.sh" >> ~/.bashrc
+
+If using Python 3.x and pip3:
 ::
 
     echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
 
+
+
 From then on, you only need to use the ``workon`` command before starting.
 
 
-
 Install Dallinger
------------------
+~~~~~~~~~~~~~~~~~
 
 Install Dallinger from the terminal by running
 ::
@@ -535,17 +618,6 @@ Test that your installation works by running:
 ::
 
     dallinger --version
-
-If you use Anaconda, installing Dallinger probably failed. The problem is
-that you need to install bindings for the ``psycopg2`` package (it helps
-Python play nicely with Postgres) and you must use conda for conda to
-know where to look for the links. You do this with:
-::
-
-    conda install psycopg2
-
-Then, try the above installation commands. They should work now, meaning
-you can move on.
 
 
 Next, you'll need :doc:`access keys for AWS, Heroku,

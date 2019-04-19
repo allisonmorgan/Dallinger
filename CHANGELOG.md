@@ -1,5 +1,64 @@
 # Change Log
 
+## [v-master](https://github.com/dallinger/dallinger/master) (xxxx-xx-xx)
+
+## [v-5.0.7](https://github.com/dallinger/dallinger/5.0.7) (2019-03-29)
+
+- Improve persistence of participant attributes in `dallinger.identity`, so that these keys and values do not need to be passed between pages as URL parameters in order to preserve them
+- Check the total size of the experiment files that will be copied and deployed, and abort if this exceeds 50MB, to avoid making potentially many copies of large files over repeated experiment runs
+- Consolidated configuration defaults in global_config_defaults.txt so default values aren't defined throughout the codebase
+- Documentation improvements and additions:
+  + Command Line Utility section: Added previously undocumented commands and expanded on optional parameters
+  + New Recruitment section: Detailed documentation of Amazon Mechanical Turk recruitment
+  + Include link to Thomas Morgan's beginner documentation
+- Internal/Developer-centric changes:
+  + Enforce standard Python code style with `"black" <https://black.readthedocs.io/en/stable/>`__
+  + Mark slowest tests so they're skipped by default (use the `--runslow` flag to run them)
+
+## [v5.0.6](https://github.com/dallinger/dallinger/tree/v5.0.6) (2019-02-28)
+
+- Heroku has deprecated the use of the --org parameter which previous versions of Dallinger used. This release fixes Dallinger to use the newer --team parameter instead, which has been available in Heroku for quite some time. The change was introduced in Heroku CLI 7.21. The --team parameter was introduced in Heroku a significant time ago, thus this version of Dallinger will work with many older versions of the Heroku CLI. If using an older version of the Heroku CLI, we recommend updating to the latest version.
+
+- Improve launch retry messaging when running in debug mode
+- `dallinger verify` now fails if you have more than one Experiment class
+
+- Fixed: Add `details` JSON data to `__json__` methods for all models.
+- Fixed bug related to running Dallinger with Redis 3.1.0 or higher.
+
+- Documentation improvements and additions:
+  + Postgres install instructions for Ubuntu have been simplified and tested
+  + Anaconda instructions have been removed
+  + Other minor documentation improvements/clarifications
+
+## [v5.0.5](https://github.com/dallinger/dallinger/tree/v5.0.5) (2019-02-15)
+
+- Documentation improvements and additions:
+  + Reintroduce working and refactored Bartlett (1932) Iterated Drawing demo
+  + Reorganize installation documentation so documentation for each supported operating system is grouped together
+
+## [v5.0.4](https://github.com/dallinger/dallinger/tree/v5.0.4) (2019-01-31)
+
+- Documentation improvements and additions:
+  + New documentation section on Networks added
+  + Reintroduce working Chatroom demo
+
+- Start monitoring Javascript code coverage
+- Change configuration of certain demos to work in free Heroku tier (hobby)
+
+- Fixed: Prevent Google Chrome from showing default browser popup when running Dallinger in debug mode
+- Fixed: Running Dallinger in debug mode on OSX now uses a new browser profile for each browser window
+
+## [v5.0.3](https://github.com/dallinger/dallinger/tree/v5.0.3) (2019-01-16)
+
+- Documentation improvements and additions:
+  + Reintroduce working and refactored Roger's paradox demo, including better documentation
+  + Correct dallinger export syntax
+
+- Give better and more verbose feedback when attempting to run an experiment from a location that is not a valid experiment directory
+
+- Fixed: Python 3.7 issues related to numpy version, numpy updated to 1.15.4
+- Fixed: Fingerprint hash appearing as undefined in experiment runs
+
 ## [v5.0.2](https://github.com/dallinger/dallinger/tree/v5.0.2) (2018-12-18)
 
 - Documentation improvements and additions:
