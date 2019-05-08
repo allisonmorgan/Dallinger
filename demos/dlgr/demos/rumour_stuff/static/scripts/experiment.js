@@ -74,11 +74,13 @@ var get_info = function() {
 
       var storyHTML = markdown.toHTML(story_one);
       $("#story_one").html(storyHTML); // Story #1
+      $("p").addClass("preventcopy");
       $("#stimulus_one").show();
       $("#finish-reading_one").show();
 
       var storyHTML = markdown.toHTML(story_two);
       $("#story_two").html(storyHTML); // Story #2
+      $("p").addClass("preventcopy");
       $("#stimulus_two").hide();
       $("#finish-reading_two").show();
 
