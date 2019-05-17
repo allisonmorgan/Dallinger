@@ -4,6 +4,9 @@ appname=$1
 #number of total participants in the experiment
 num_participants=$2
 
+#Extract from config.txt if it is sandbox or live option
+mode_experiment=`grep "mode" config.txt | awk -F "=" '{print $2}' | sed 's/ //g'`
+
 rm -r ./data/*
 rm ./data/*
 #two indexes: one for the real participants (np) and the other index just in case of failure with some participants
@@ -12,6 +15,8 @@ unzip -o ./data/*.zip
 l=`wc -l data/participant.csv | awk '{print $1}'`
 np=`awk -F "," '{ print $8}' data/node.csv | tail -n +2 | grep  -c "f"`
 np=$((np-1))
+
+
 
 
 echo "Total number of current participants: $np"
@@ -33,13 +38,13 @@ do
 	#checking the lines of the file participant.csv for extending the HIT
 	if (( $current_size == $l ))
 	then
-		echo "sleeping for 5 min..."
+		echo "sleeping for 5 minutes..."
 		sleep 300
 	else
-		echo "Extending the HITs"
-		python boto3_extension.py $((np+1))
-		np=$((np+1))
-		l=$((l+1))
+			echo "Extending the HITs"
+			python boto3_extension.py $((np+1)) $mode_experiment
+			np=$((np+1))
+			l=$((l+1))
 	fi
 	rm -r ./data/*
 done
