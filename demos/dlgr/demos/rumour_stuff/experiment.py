@@ -31,7 +31,7 @@ class Bartlett1932(Experiment):
         self.experiment_repeats = 1
         self.initial_recruitment_size = 1
         self.generation_size = 2
-        self.generations = 3
+        self.generations = 5
         if session:
             self.setup()
 
