@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block body %}    
+    <style>
+    .preventcopy {
+      -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+         -khtml-user-select: none; /* Konqueror HTML */
+           -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                      supported by Chrome and Opera */
+    }
+    </style>
+
+    <div class="main_div">
+        <div id="stimulus_one">
+            <h1>Read the first text:</h1>
+            <div><blockquote id="story_one"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>
+            <button id="finish-reading_one" type="button" class="btn btn-primary">I'm done reading the first story.</button>
+        </div>
+
+        <div id="stimulus_two" style="display:none;">
+            <h1>Read the second text (even if similar to the previous one):</h1>
+            <div><blockquote id="story_two"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>
+            <button id="finish-reading_two" type="button" class="btn btn-primary">I'm done reading the second story.</button>
+        </div>
+
+        <div id="intermediary_task" style="display:none;">
+            <h1>What is the result of the following operation: 179+240=?</h1>
+            <textarea rows="2"></textarea>
+            <button id="task-completed" type="button" class="btn btn-primary">Continue</button>
+        </div>
+
+
+        <div id="response-form" style="display:none;">
+            <p>Now using the information you received in the two texts, reproduce the passage to the best of your ability.<p>
+            <textarea id="reproduction" class="form-control" rows="10"></textarea>
+            <p></p>
+            <button id="submit-response" type="button" class="btn btn-primary">Submit response.</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        create_agent();
+    </script>
+{% endblock %}
