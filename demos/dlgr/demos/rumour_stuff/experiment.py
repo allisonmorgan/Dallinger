@@ -32,6 +32,8 @@ class Bartlett1932(Experiment):
         self.initial_recruitment_size = 1
         self.generation_size = 2
         self.generations = 3
+        self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
+        self.max_bonus_amount=1.50
         if session:
             self.setup()
 
@@ -96,6 +98,66 @@ class Bartlett1932(Experiment):
         else:
             self.recruiter.close_recruitment()
 
+    def get_submitted_text(self, participant):
+        """The text a given participant submitted"""
+        node = participant.nodes()[0]
+        return node.infos()[0].contents
+
+    def get_read_text(self, participant):
+        """The text that a given participant was shown to memorize"""
+        node = participant.nodes()[0]
+        incoming = node.all_incoming_vectors[0]
+        parent_node = incoming.origin
+        return parent_node.infos()[0].contents
+
+    def text_similarity(self, one, two):
+        """Return a measure of the similarity between two texts"""
+        try:
+            from Levenshtein import ratio
+            from Levenshtein import distance
+        except ImportError:
+            from difflib import SequenceMatcher
+            ratio = lambda x, y: SequenceMatcher(None, x, y).ratio()
+        #return (ratio(one, two)*len(one))/(2*len(two))
+        return ratio(one, two)
+
+
+    def attention_check(self, participant):
+        performance = self.text_similarity(
+            self.get_submitted_text(participant),
+            self.get_read_text(participant))
+        #print("performance of the participant: ",performance)
+        return ( 0.02 <= performance <= 0.8)
+
+    def bonus(self, participant):
+        """The bonus to be awarded to the given participant.
+        Return the value of the bonus to be paid to `participant`.
+        """
+
+        text_input=str(self.get_read_text(participant))
+        len_text=2*len(text_input.split(' '))
+        text_reward=0.001 * len_text
+        performance = self.text_similarity(
+            self.get_submitted_text(participant),
+            self.get_read_text(participant))
+        #print("Length of the text: ",len_text)
+        #print("Text reward: ",text_reward)
+        payout = round(self.bonus_amount * text_reward , 2)
+        #print("Payout:",payout)
+        if performance <= 0.02:
+            return 0.00
+        else:
+            return min(payout, self.max_bonus_amount)
+
+
+    # def bonus_reason(self):
+    #     """The reason offered to the participant for giving the bonus.
+    #     """
+    #     return (
+    #         "Thank you for participating! You earned a bonus based on the "
+    #         "length of the text you read!"
+    #         )
+
 
 class Bot(BotBase):
     """Bot tasks for experiment participation"""
@@ -109,6 +171,8 @@ class Bot(BotBase):
             stimulus = self.driver.find_element_by_id('stimulus')
             story = stimulus.find_element_by_id('story')
             story_text = story.text
+
+            print(story_text)
             logger.info("Stimulus text:")
             logger.info(story_text)
             ready.click()
