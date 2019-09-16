@@ -1,68 +1,31 @@
+from dallinger.nodes import Source
+from dallinger.nodes import Agent
+from dallinger.models import Info
+from dallinger.models import Network, Node, Participant
+from dallinger.recruiters import MTurkRecruiter # TODO: is the recruiter fixed?
 
-from operator import attrgetter
-
-from sqlalchemy import Float, Integer
+from sqlalchemy import Integer, String, Float
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.expression import cast
 
-from dallinger.nodes import Source, Agent
-from dallinger.networks import Network
+from operator import attrgetter
 import random
+import json
+# import pysnooper
 
+SINGLEPARENT = False
 
-# TODO: if we want to show different stories across networks, we have to make fancier changes 
-class WarOfTheGhostsSource(Source):
-    """A Source that reads in a random story from a file and transmits it."""
+class ParticleFilter(Network):
+    """Discrete fixed size generations with random transmission"""
 
-    __mapper_args__ = {
-        "polymorphic_identity": "war_of_the_ghosts_source"
-    }
+    __mapper_args__ = {"polymorphic_identity": "particlefilter"}
 
-    def _contents(self):
-        """Define the contents of new Infos.
-
-        transmit() -> _what() -> create_information() -> _contents().
-        """
-        story = "superbugs.md"
-        with open("static/stimuli/{}".format(story), "r") as f:
-            return f.read()
-
-class RogersAgent(Agent):
-    """The Rogers Agent."""
-
-    __mapper_args__ = {"polymorphic_identity": "rogers_agent"}
-
-    @hybrid_property
-    def generation(self):
-        """Convert property2 to genertion."""
-        return int(self.property2)
-
-    @generation.setter
-    def generation(self, generation):
-        """Make generation settable."""
-        self.property2 = repr(generation)
-
-    @generation.expression
-    def generation(self):
-        """Make generation queryable."""
-        return cast(self.property2, Integer)
-
-
-class MultiChain(Network):
-    """A multi-chained network
-    """
-
-    __mapper_args__ = {"polymorphic_identity": "multi-chain"}
-
-    def __init__(self, generations, generation_size, initial_source):
+    def __init__(self, generations, generation_size):
         """Endow the network with some persistent properties."""
         self.property1 = repr(generations)
         self.property2 = repr(generation_size)
-        self.property3 = repr(initial_source)
-        if self.initial_source:
-            self.max_size = generations * generation_size + 1
-        else:
-            self.max_size = generations * generation_size
+        self.max_size = generations * generation_size + 1 # add one to account for initial_source
+        self.current_generation = 0
 
     @property
     def generations(self):
@@ -73,41 +36,96 @@ class MultiChain(Network):
     def generation_size(self):
         """The width of the network: the size of a single generation."""
         return int(self.property2)
+    
+    @hybrid_property
+    def current_generation(self):
+        """Make property3 current_generation."""
+        return int(self.property3)
 
-    @property
-    def initial_source(self):
-        """The source that seeds the first generation."""
-        return self.property3.lower() != 'false'
+    @current_generation.setter
+    def current_generation(self, current_generation):
+        """Make current_generation settable."""
+        self.property3 = repr(current_generation)
 
+    @current_generation.expression
+    def current_generation(self):
+        """Make current_generation queryable."""
+        return cast(self.property3, Integer)
+
+    @hybrid_property
+    def decision_index(self):
+        """Make property4 decision_index."""
+        return int(self.property4)
+
+    @decision_index.setter
+    def decision_index(self, decision_index):
+        """Make decision_index settable."""
+        self.property4 = repr(decision_index)
+
+    @decision_index.expression
+    def decision_index(self):
+        """Make decision_index queryable."""
+        return cast(self.property4, Integer)
+
+    # @pysnooper.snoop()
     def add_node(self, node):
-        """Link to the agent from a parent based on the parent's fitness"""
-        num_agents = len(self.nodes(type=Agent))
-        curr_generation = int((num_agents - 1) / float(self.generation_size))
-        node.generation = curr_generation
+        
+        node.generation = self.current_generation
 
-        parents = []
-        if curr_generation == 0 and self.initial_source:
-            parents = [self._select_oldest_source()]
+        if self.current_generation == 0:
+            parent = self._select_oldest_source()
+            if parent is not None:
+                parent.connect(whom=node)
+                parent.transmit(to_whom=node)
         else:
-            parents = self._get_nodes_from_generation(
-                node_type=type(node),
-                generation=curr_generation - 1
-            )
 
-        if len(parents) > 0:
-
-            for p in parents:
-                p.connect(whom=node)
-                p.transmit(to_whom=node)
+            if SINGLEPARENT:
+                sampled_parent = random.choice(list(filter(lambda node: int(node.generation) == int(self.current_generation) - 1, self.nodes(failed=False, type=Particle))))
+                sampled_parent.connect(whom=node)
+                sampled_parent.transmit(to_whom=node)
+            else:
+                parents = list(filter(lambda node: int(node.generation) == int(self.current_generation) - 1, self.nodes(failed=False, type=Particle)))
+                for parent in parents:
+                    parent.connect(whom=node)
+                    parent.transmit(to_whom=node)
 
     def _select_oldest_source(self):
-        return min(self.nodes(type=Source), key=attrgetter('creation_time'))
+        return min(self.nodes(type=Source), key=attrgetter("creation_time"))
 
-    def _get_nodes_from_generation(self, node_type, generation):
-        prev_agents = node_type.query\
-            .filter_by(failed=False,
-                       network_id=self.id,
-                       generation=(generation))\
-            .all()
 
-        return prev_agents
+class Particle(Node):
+    """The Rogers Agent."""
+
+    __mapper_args__ = {"polymorphic_identity": "particle"}
+
+    @hybrid_property
+    def generation(self):
+        """Convert property3 to genertion."""
+        return int(self.property3)
+
+    @generation.setter
+    def generation(self, generation):
+        """Make generation settable."""
+        self.property3 = repr(generation)
+
+    @generation.expression
+    def generation(self):
+        """Make generation queryable."""
+        return cast(self.property3, Integer)
+
+    def __init__(self, contents=None, details = None, network = None, participant = None):
+        super(Particle, self).__init__(network, participant)
+
+class WarOfTheGhostsSource(Source):
+    """A Source that reads in a random story from a file and transmits it."""
+    __mapper_args__ = {
+        "polymorphic_identity": "war_of_the_ghosts_source"
+    }
+
+    def _contents(self):
+        """Define the contents of new Infos.
+        transmit() -> _what() -> create_information() -> _contents().
+        """
+        story = "superbugs.md"
+        with open("static/stimuli/{}".format(story), "r") as f:
+            return f.read()

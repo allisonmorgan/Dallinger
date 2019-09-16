@@ -1,23 +1,35 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
 import logging
+import pysnooper
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from models import RogersAgent, MultiChain
+from sqlalchemy import and_, func
+from sqlalchemy.sql.expression import cast
 from dallinger.bots import BotBase
+from dallinger.config import get_config
+from dallinger.networks import Chain
 from dallinger.experiment import Experiment
 
 
 logger = logging.getLogger(__file__)
 
+# attention check not working (just changed to true)
+# bonus calculation not working correctly ... I think these may be related
+
 
 class Bartlett1932(Experiment):
-    """Define the structure of the experiment."""
+    @property
+    def public_properties(self):
+        return {
+        'generation_size':1
+        }
 
+    """Define the structure of the experiment."""
     def __init__(self, session=None):
         """Call the same function in the super (see experiments.py in dallinger).
 
@@ -27,88 +39,91 @@ class Bartlett1932(Experiment):
         """
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
+
         self.models = models
-        self.experiment_repeats = 1
-        self.initial_recruitment_size = 1
-        self.generation_size = 2
-        self.generations = 3
+        self.initial_recruitment_size = self.generation_size = self.public_properties['generation_size']
+        self.generations = 2
+        self.num_practice_networks_per_experiment = 0
+        self.num_experimental_networks_per_experiment = 1
+        self.num_fixed_order_experimental_networks_per_experiment = 1
+        self.num_random_order_experimental_networks_per_experiment = 0
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
         self.max_bonus_amount=1.50
         if session:
             self.setup()
 
+
+    def configure(self):
+        config = get_config()
+
     def setup(self):
-        """Setup the networks.
+        """Setup the networks"""
 
-        Setup only does stuff if there are no networks, this is so it only
-        runs once at the start of the experiment. It first calls the same
-        function in the super (see experiments.py in dallinger). Then it adds a
-        source to each network.
-        """
+        """Create the networks if they don't already exist."""
         if not self.networks():
-            super(Bartlett1932, self).setup()
-            for net in self.networks():
-                self.models.WarOfTheGhostsSource(network=net)
+            for p in range(self.num_practice_networks_per_experiment):
+                network = self.create_network(role = 'practice', decision_index = p)
+                self.models.WarOfTheGhostsSource(network=network)
+                
+            for f in range(self.num_fixed_order_experimental_networks_per_experiment):
+                decision_index = self.num_practice_networks_per_experiment + f
+                network = self.create_network(role = 'experiment', decision_index = decision_index)
+                self.models.WarOfTheGhostsSource(network=network)
 
-    def create_network(self):
-        """Create a new network."""
-        return MultiChain(
-            generations=self.generations,
-            generation_size=self.generation_size,
-            initial_source=True
-        )
+            for r in range(self.num_random_order_experimental_networks_per_experiment):
+                decision_index = self.num_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment + r
+                network = self.create_network(role = 'experiment', decision_index = decision_index)
+                self.models.WarOfTheGhostsSource(network=network)
+            self.session.commit()
 
     def create_node(self, network, participant):
-        """Make a new node for participants."""
-        return self.models.RogersAgent(network=network,participant=participant)
+        return self.models.Particle(network=network,participant=participant)
 
-    #def add_node_to_network(self, node, network):
-    #    """Add participant's node to a network."""
-    #    network.add_node(node)
-    #    node.receive()
-
-        #environment = network.nodes(type=Environment)[0]
-        #environment.connect(whom=node)
-        #environment.transmit(to_whom=node)
-
-        #if node.generation > 0:
-        #    agent_model = self.models.RogersAgent
-        #    prev_agents = agent_model.query\
-        #        .filter_by(failed=False,
-        #                   network_id=network.id,
-        #                   generation=node.generation - 1)\
-        #        .all()
-        #    parent = random.choice(prev_agents)
-        #    parent.connect(whom=node) # TODO: DiscreteGenerational network also connects nodes. why doesn't this line create a second vector in the database?
-        #    parent.transmit(what=Meme, to_whom=node)
-
-        #node.receive()
-
-
+    def create_network(self, role, decision_index):
+        """Return a new network."""
+        net = self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size)
+        net.role = role
+        net.decision_index = decision_index
+        self.session.add(net)
+        return net
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
         network.add_node(node)
+        parents = node.neighbors(direction="from")
+        #if len(parents):
+        #    parent = parents[0]
+        #    parent.transmit()
         node.receive()
-
-    def recruit(self):
-        """Recruit one participant at a time until all networks are full."""
-        if self.networks(full=False):
-            self.recruiter.recruit(n=1)
-        else:
-            self.recruiter.close_recruitment()
 
     def get_submitted_text(self, participant):
         """The text a given participant submitted"""
         node = participant.nodes()[0]
         return node.infos()[0].contents
 
+    #@pysnooper.snoop()
     def get_read_text(self, participant):
         """The text that a given participant was shown to memorize"""
         node = participant.nodes()[0]
-        incoming = node.all_incoming_vectors[0]
-        parent_node = incoming.origin
-        return parent_node.infos()[0].contents
+        node_length = len(node.all_incoming_vectors)
+        contents_list = []
+        for indexi in range(node_length):
+            curr_incoming = node.all_incoming_vectors[indexi]
+            curr_origin = curr_incoming.origin
+            contents_list.append(curr_origin.infos()[0].contents)
+        return contents_list
+
+    #@pysnooper.snoop()
+    def attention_check(self, participant):
+        read_text = self.get_read_text(participant)
+        num_read_text = len(read_text)
+        total_performance = 0
+        for readi in range(num_read_text):
+            curr_performance = self.text_similarity(self.get_submitted_text(participant), read_text[readi])
+            total_performance += curr_performance
+        average_performance = total_performance /  num_read_text  
+        return ( 0.01 <= average_performance <= 0.8)
+        
 
     def text_similarity(self, one, two):
         """Return a measure of the similarity between two texts"""
@@ -121,75 +136,122 @@ class Bartlett1932(Experiment):
         #return (ratio(one, two)*len(one))/(2*len(two))
         return ratio(one, two)
 
-
-    def attention_check(self, participant):
-        performance = self.text_similarity(
-            self.get_submitted_text(participant),
-            self.get_read_text(participant))
-        #print("performance of the participant: ",performance)
-        return ( 0.02 <= performance <= 0.8)
-
+    #@pysnooper.snoop()
     def bonus(self, participant):
         """The bonus to be awarded to the given participant.
         Return the value of the bonus to be paid to `participant`.
         """
 
-        text_input=str(self.get_read_text(participant))
-        len_text=2*len(text_input.split(' '))
-        text_reward=0.001 * len_text
-        performance = self.text_similarity(
+        text_input=self.get_read_text(participant)
+        total_performance = 0
+        len_text = 0
+        for storyi in range(len(text_input)):
+            len_text += 2*len(str(text_input[storyi]).split(' '))
+            curr_performance = self.text_similarity(
             self.get_submitted_text(participant),
-            self.get_read_text(participant))
-        #print("Length of the text: ",len_text)
-        #print("Text reward: ",text_reward)
+            text_input[storyi])
+            total_performance += curr_performance
+        average_performance = total_performance/len(text_input)
+        if participant.nodes()[0].generation == 0:
+            text_reward = (0.001 * len_text)*self.generation_size # read multiple versions of the same thing
+        else:
+            text_reward = (0.001 * len_text)
         payout = round(self.bonus_amount * text_reward , 2)
         #print("Payout:",payout)
-        if performance <= 0.02:
-            return 0.00
+        if average_performance <= 0.01:
+            return round(self.max_bonus_amount/4,2)
         else:
             return min(payout, self.max_bonus_amount)
 
 
-    # def bonus_reason(self):
-    #     """The reason offered to the participant for giving the bonus.
-    #     """
-    #     return (
-    #         "Thank you for participating! You earned a bonus based on the "
-    #         "length of the text you read!"
-    #         )
+    # #@pysnooper.snoop()
+    def get_network_for_existing_participant(self, participant, participant_nodes):
+        """Obtain a netwokr for a participant who has already been assigned to a condition by completeing earlier rounds"""
 
+        # which networks has this participant already completed?
+        networks_participated_in = [node.network_id for node in participant_nodes]
+        
+        # How many decisions has the particiapnt already made?
+        completed_decisions = len(networks_participated_in)
 
-class Bot(BotBase):
-    """Bot tasks for experiment participation"""
+        # When the participant has completed all networks in their condition, their experiment is over
+        # returning None throws an error to the fronted which directs to questionnaire and completion
+        if completed_decisions == self.num_practice_networks_per_experiment + self.num_experimental_networks_per_experiment:
+            return None
 
-    def participate(self):
-        """Finish reading and send text"""
-        try:
-            logger.info("Entering participate method")
-            ready = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, 'finish-reading')))
-            stimulus = self.driver.find_element_by_id('stimulus')
-            story = stimulus.find_element_by_id('story')
-            story_text = story.text
+        nfixed = self.num_practice_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
 
-            print(story_text)
-            logger.info("Stimulus text:")
-            logger.info(story_text)
-            ready.click()
-            submit = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, 'submit-response')))
-            textarea = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, 'reproduction')))
-            textarea.clear()
-            text = self.transform_text(story_text)
-            logger.info("Transformed text:")
-            logger.info(text)
-            textarea.send_keys(text)
-            submit.click()
-            return True
-        except TimeoutException:
-            return False
+        # If the participant must still follow the fixed network order
+        if completed_decisions < nfixed:
+            # find the network that is next in the participant's schedule
+            # match on completed decsions b/c decision_index counts from zero but completed_decisions count from one
+            return self.models.Network.query.filter(self.models.Network.property4 == repr(completed_decisions)).filter_by(full = False).one()
 
-    def transform_text(self, text):
-        """Experimenter decides how to simulate participant response"""
-        return "Some transformation...and %s" % text
+        # If it is time to sample a network at random
+        else:
+            # find networks which match the participant's condition and werent' fixed order nets
+            matched_condition_experimental_networks = self.models.Network.query.filter(cast(self.models.Network.property4, Integer) >= nfixed).filter_by(full = False).all()
+            
+            # subset further to networks not already participated in (because here decision index doesnt guide use)
+            availible_options = [net for net in matched_condition_experimental_networks if net.id not in networks_participated_in]
+            
+            # choose randomly among this set
+            chosen_network = random.choice(availible_options)
+
+        return chosen_network
+
+    # #@pysnooper.snoop(prefix = "@snoop: ")
+    def get_network_for_new_participant(self, participant):
+        key = "experiment.py >> get_network_for_new_participant ({}); ".format(participant.id)
+
+        # Return first-trial networks
+        return self.models.ParticleFilter.query.filter_by(full = False).filter(self.models.ParticleFilter.property4 == repr(0)).one_or_none()
+
+    #@pysnooper.snoop()
+    def get_network_for_participant(self, participant):
+        """Find a network for a participant."""
+        key = "experiment.py >> get_network_for_participant ({}); ".format(participant.id)
+        participant_nodes = participant.nodes()
+        if not participant_nodes:
+            chosen_network = self.get_network_for_new_participant(participant)
+        else:
+            chosen_network = self.get_network_for_existing_participant(participant, participant_nodes)
+
+        if chosen_network is not None:
+            self.log("Assigned to network: {}; Decsion Index: {};".format(chosen_network.id, chosen_network.decision_index), key)
+
+        else:
+            self.log("Requested a network but was assigned None.".format(len(participant_nodes)), key)
+
+        return chosen_network
+
+    # @pysnooper.snoop()
+    def get_current_generation(self):
+        network = self.models.ParticleFilter.query.first()
+        return repr(int(network.property3))
+
+    def rollover_generation(self):
+        for network in self.models.ParticleFilter.query.all():
+            network.current_generation = int(network.current_generation) + 1
+        self.log("Rolled over all network to generation {}".format(network.current_generation), "experiment.py >> rollover_generation: ")
+
+    # @pysnooper.snoop()
+    def recruit(self):
+        """Recruit one participant at a time until all networks are full."""
+        if self.networks(full=False):
+            current_generation = self.get_current_generation()
+
+            completed_participant_ids = [p.id for p in self.models.Participant.query.filter_by(failed = False, status = "approved")]
+            
+            # particle.property3 = generation
+            completed_nodes_this_generation = self.models.Particle.query.filter(
+                                                                            self.models.Particle.property3 == current_generation, \
+                                                                            self.models.Particle.participant_id.in_(completed_participant_ids)) \
+                                                                        .count() 
+
+            if completed_nodes_this_generation == self.generation_size:
+                self.rollover_generation()
+                self.recruiter.recruit(n=self.generation_size)
+
+        else:
+            self.recruiter.close_recruitment()
