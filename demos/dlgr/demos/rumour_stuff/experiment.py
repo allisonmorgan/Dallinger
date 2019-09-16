@@ -1,7 +1,8 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
 import logging
-import pysnooper
+#import pysnooper
+import ast
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
@@ -42,7 +43,7 @@ class Bartlett1932(Experiment):
 
         self.models = models
         self.initial_recruitment_size = self.generation_size = self.public_properties['generation_size']
-        self.generations = 2
+        self.generations = 3
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
@@ -89,8 +90,11 @@ class Bartlett1932(Experiment):
 
     def get_submitted_text(self, participant):
         """The text a given participant submitted"""
-        node = participant.nodes()[0]
-        return node.infos()[0].contents
+        submitted_text = participant.nodes()[0].infos()[0].contents
+        if submitted_text[0]=='{':
+            submitted_dict = ast.literal_eval(submitted_text)
+            submitted_text = submitted_dict['response']
+        return submitted_text
 
     #@pysnooper.snoop()
     def get_read_text(self, participant):
@@ -101,7 +105,11 @@ class Bartlett1932(Experiment):
         for indexi in range(node_length):
             curr_incoming = node.all_incoming_vectors[indexi]
             curr_origin = curr_incoming.origin
-            contents_list.append(curr_origin.infos()[0].contents)
+            curr_text = curr_origin.infos()[0].contents
+            if curr_text[0]=='{':
+                curr_dict = ast.literal_eval(curr_text)
+                curr_text = curr_dict['response']
+            contents_list.append(curr_text)
         return contents_list
 
     #@pysnooper.snoop()
@@ -111,9 +119,13 @@ class Bartlett1932(Experiment):
         total_performance = 0
         for readi in range(num_read_text):
             curr_performance = self.text_similarity(self.get_submitted_text(participant), read_text[readi])
+            #print('SUBMITTED TEXT:', self.get_submitted_text(participant))
+            #print('RECEIVED TEXT:', readi, read_text[readi])
+            #print('TYPE OF TEXT:', type(self.get_submitted_text(participant)))
             total_performance += curr_performance
-        average_performance = total_performance /  num_read_text  
-        return ( 0.01 <= average_performance <= 0.8)
+        average_performance = total_performance /  num_read_text
+        #print("AVERAGE PERFORMANCE:",average_performance)  
+        return ( 0.015 <= average_performance <= 0.8)
         
 
     def text_similarity(self, one, two):
@@ -149,7 +161,7 @@ class Bartlett1932(Experiment):
             text_reward = (0.001 * len_text)
         payout = round(self.bonus_amount * text_reward , 2)
         #print("Payout:",payout)
-        if average_performance <= 0.01:
+        if average_performance <= 0.015:
             return round(self.max_bonus_amount/4,2)
         else:
             return min(payout, self.max_bonus_amount)

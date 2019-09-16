@@ -1,33 +1,31 @@
 [Experiment]
 mode = live
 auto_recruit = true
-webdriver_type = phantomjs
+loglevel = 0
 
 [MTurk]
-title = Superbugs Information
-description = Read a brief story and answer some questions about it.
+title = Psychology Experiment: Read stories and answer questions about them (<7 mins, bonus up to $1.50, no mobile please)
+description = Read stories and answer questions about them.
 keywords = psychology, reading, text
-base_payment = 1.00
+base_payment = 1.25
 lifetime = 24
-duration = 1
+duration = 0.5
 us_only = true
 approve_requirement = 99
-contact_email_on_error = rumorstuff@gmail.com
-group_name = Superbug
+contact_email_on_error = mdhardy@princeton.edu
+group_name = rumourStuff
 assign_qualifications = true
-qualification_blacklist = Superbug
-organization_name = University of Washington
+qualification_blacklist = rumourStuff
+organization_name = Princeton University
 browser_exclude_rule = MSIE, mobile, tablet
 
 [Database]
 database_url = postgresql://postgres@localhost/dallinger
-database_size = hobby-dev
+database_size = standard-2
 
 [Server]
-dyno_type = free
-num_dynos_web = 1
-num_dynos_worker = 1
+dyno_type = standard-2x
+num_dynos_web = 2
+num_dynos_worker = 2
 host = 0.0.0.0
-notification_url = None
 clock_on = false
-logfile = -

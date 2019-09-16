@@ -1,1 +1,1 @@
-dallinger==5.0.7
+-e git://github.com/Dallinger/Dallinger.git@rest-to-sns#egg=dallinger

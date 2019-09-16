@@ -81,7 +81,7 @@ function update_story_html(story_html,curr_story,total_stories){
       })
     } else {
       $("#finish-reading").click(function(){
-        $("#finish-reading").html("Please read for at least 30 seconds");
+        $("#finish-reading").html("Please read for at least 20 seconds");
         $(window).scrollTop(0);
         $("#story").html('&lt;&lt; loading &gt;&gt;')
         $("#finish-reading").addClass('disabled')
@@ -93,7 +93,7 @@ function update_story_html(story_html,curr_story,total_stories){
         },500)
       })
     }
-  },30000)
+  },20000)
 }
 
 // Create the agent.
