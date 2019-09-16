@@ -43,10 +43,8 @@ class Bartlett1932(Experiment):
         self.models = models
         self.initial_recruitment_size = self.generation_size = self.public_properties['generation_size']
         self.generations = 2
-        self.num_practice_networks_per_experiment = 0
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
-        self.num_random_order_experimental_networks_per_experiment = 0
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
         self.max_bonus_amount=1.50
         if session:
@@ -61,19 +59,12 @@ class Bartlett1932(Experiment):
 
         """Create the networks if they don't already exist."""
         if not self.networks():
-            for p in range(self.num_practice_networks_per_experiment):
-                network = self.create_network(role = 'practice', decision_index = p)
-                self.models.WarOfTheGhostsSource(network=network)
                 
             for f in range(self.num_fixed_order_experimental_networks_per_experiment):
-                decision_index = self.num_practice_networks_per_experiment + f
+                decision_index = f
                 network = self.create_network(role = 'experiment', decision_index = decision_index)
                 self.models.WarOfTheGhostsSource(network=network)
 
-            for r in range(self.num_random_order_experimental_networks_per_experiment):
-                decision_index = self.num_experimental_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment + r
-                network = self.create_network(role = 'experiment', decision_index = decision_index)
-                self.models.WarOfTheGhostsSource(network=network)
             self.session.commit()
 
     def create_node(self, network, participant):
@@ -176,10 +167,10 @@ class Bartlett1932(Experiment):
 
         # When the participant has completed all networks in their condition, their experiment is over
         # returning None throws an error to the fronted which directs to questionnaire and completion
-        if completed_decisions == self.num_practice_networks_per_experiment + self.num_experimental_networks_per_experiment:
+        if completed_decisions == self.num_experimental_networks_per_experiment:
             return None
 
-        nfixed = self.num_practice_networks_per_experiment + self.num_fixed_order_experimental_networks_per_experiment
+        nfixed = self.num_fixed_order_experimental_networks_per_experiment
 
         # If the participant must still follow the fixed network order
         if completed_decisions < nfixed:

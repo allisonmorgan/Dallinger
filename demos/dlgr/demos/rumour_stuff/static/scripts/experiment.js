@@ -10,7 +10,7 @@ $(document).ready(function() {
     $("#submit-response").html('Submit');
   });*/
 
-  $("#task-completed").click(function() {
+  $("#submit-response").click(function() {
     $("#submit-response").addClass('disabled');
     $("#submit-response").html('Sending...');
 
@@ -75,7 +75,9 @@ function update_story_html(story_html,curr_story,total_stories){
     if (curr_story==total_stories){
       $("#finish-reading").click(function(){
         $("#stimulus").hide();
-        $("#intermediary_task").show();
+        $("#response-form").show();
+        $("#submit-response").removeClass('disabled');
+        $("#submit-response").html('Submit');
       })
     } else {
       $("#finish-reading").click(function(){
