@@ -1,0 +1,5 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,type,participant_id,number,question,response
+1,2019-09-16 15:24:39.342657,,,,,,f,,{},question,1,1,questionnaire,"{""language"":""Yes"",""education"":""3"",""age"":""0"",""ideology"":""9"",""technical_issues"":"""",""confusion"":"""",""engagement"":""8"",""difficulty"":""5""}"
+2,2019-09-16 15:47:54.725641,,,,,,f,,{},question,2,1,questionnaire,"{""language"":""Yes"",""education"":""4"",""age"":""0"",""ideology"":""8"",""technical_issues"":""No issues"",""confusion"":""Nothing confusing"",""engagement"":""10"",""difficulty"":""3""}"
+3,2019-09-16 16:04:57.538186,,,,,,f,,{},question,3,1,questionnaire,"{""language"":""Yes"",""education"":""6"",""age"":""2"",""ideology"":""7"",""technical_issues"":""no"",""confusion"":""no"",""engagement"":""8"",""difficulty"":""6""}"
+4,2019-09-16 16:22:54.789778,,,,,,f,,{},question,4,1,questionnaire,"{""language"":""Yes"",""education"":""5"",""age"":""3"",""ideology"":""8"",""technical_issues"":""no"",""confusion"":""no"",""engagement"":""9"",""difficulty"":""5""}"

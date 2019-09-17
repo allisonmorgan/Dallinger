@@ -4,7 +4,7 @@ auto_recruit = true
 loglevel = 0
 
 [MTurk]
-title = Psychology Experiment: Read stories and answer questions about them (<7 mins, bonus up to $1.50, no mobile please)
+title = Psychology Experiment: Read stories and answer questions about them (<10 mins, bonus up to $1.75, no mobile please)
 description = Read stories and answer questions about them.
 keywords = psychology, reading, text
 base_payment = 1.25

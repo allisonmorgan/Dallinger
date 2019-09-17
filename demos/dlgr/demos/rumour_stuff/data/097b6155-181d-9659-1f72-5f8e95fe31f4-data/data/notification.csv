@@ -1,0 +1,9 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,assignment_id,event_type
+1,2019-09-16 15:21:51.499401,,,,,,f,,{},3XUHV3NRVMMITGRSX9MLENTXJ2U5H7,AssignmentAccepted
+2,2019-09-16 15:24:53.079427,,,,,,f,,{},3XUHV3NRVMMITGRSX9MLENTXJ2U5H7,AssignmentSubmitted
+3,2019-09-16 15:24:57.012533,,,,,,f,,{},31JLPPHS2WIP7IQBN3TIJZSEHSI3O4,AssignmentAccepted
+4,2019-09-16 15:48:24.320938,,,,,,f,,{},31JLPPHS2WIP7IQBN3TIJZSEHSI3O4,AssignmentSubmitted
+5,2019-09-16 15:48:26.080618,,,,,,f,,{},3WZ36BJEV54AN5ZWYDUNVSWD4SJBTW,AssignmentAccepted
+6,2019-09-16 16:05:10.575528,,,,,,f,,{},3WZ36BJEV54AN5ZWYDUNVSWD4SJBTW,AssignmentSubmitted
+7,2019-09-16 16:05:39.364319,,,,,,f,,{},3YWRV122CUN6LKGEV60N9MSEF09U8B,AssignmentAccepted
+8,2019-09-16 16:23:30.643204,,,,,,f,,{},3YWRV122CUN6LKGEV60N9MSEF09U8B,AssignmentSubmitted

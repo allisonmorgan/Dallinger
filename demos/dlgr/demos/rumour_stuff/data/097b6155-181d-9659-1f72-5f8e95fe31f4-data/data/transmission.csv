@@ -1,0 +1,5 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,vector_id,info_id,origin_id,destination_id,network_id,receive_time,status
+1,2019-09-16 15:23:03.86727,,,,,,t,2019-09-16 15:24:53.754377,{},1,1,1,2,1,2019-09-16 15:23:03.880295,received
+2,2019-09-16 15:35:00.231549,,,,,,f,,{},2,3,1,3,1,2019-09-16 15:35:00.252277,received
+3,2019-09-16 15:58:17.524076,,,,,,f,,{},3,4,3,4,1,2019-09-16 15:58:17.537457,received
+4,2019-09-16 16:17:19.260903,,,,,,f,,{},4,5,4,5,1,2019-09-16 16:17:19.283515,received

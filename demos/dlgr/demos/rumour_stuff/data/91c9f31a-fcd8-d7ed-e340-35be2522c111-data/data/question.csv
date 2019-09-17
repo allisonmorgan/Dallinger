@@ -1,0 +1,2 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,type,participant_id,number,question,response
+1,2019-05-04 07:35:06.256049,,,,,,f,,{},question,1,1,questionnaire,"{""language"":""No"",""education"":""8"",""age"":""0"",""ideology"":""9"",""technical_issues"":""d"",""confusion"":""a"",""engagement"":""5"",""difficulty"":""5""}"

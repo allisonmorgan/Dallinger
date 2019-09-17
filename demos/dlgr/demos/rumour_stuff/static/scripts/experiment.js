@@ -2,6 +2,8 @@ var my_node_id,curr_generation
 // Consent to the experiment.
 $(document).ready(function() {
 
+    //-e git://github.com/Dallinger/Dallinger.git@rest-to-sns#egg=dallinger
+
   /*
   $("#task-completed").click(function() {
     $("#intermediary_task").hide();
@@ -109,6 +111,18 @@ var create_agent = function() {
       dallinger.getExperimentProperty('generation_size')
         .done(function (propertiesResp) {
           generation_size = propertiesResp.generation_size
+          if (generation_size==1){
+            $('#response-header').html('Using the information you read in the text, reproduce the passage to the best of your ability.')
+          } else if (generation_size==2){
+            $('#response-header').html("<p id ='more-info'>These stories were two different MTurk workers' attempts to reproduce the same passage.</p><p>Using the information you read in the two texts, please reproduce the original passage to the best of your ability.</p>")
+          } else if (generation_size==3){
+            $('#response-header').html("<p id ='more-info'>These stories were three different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the three texts, please reproduce the original passage to the best of your ability.</p>")
+          } else{
+            $('#response-header').html("<p id ='more-info'>These stories were four different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the four texts, please reproduce the original passage to the best of your ability.</p>")
+          }
+          if (curr_generation==0){
+            $('#more-info').css('display','none')
+          }
           get_info();
         })
         .fail(function (rejection) {

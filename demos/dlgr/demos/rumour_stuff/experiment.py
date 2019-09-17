@@ -27,7 +27,7 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':1
+        'generation_size':3
         }
 
     """Define the structure of the experiment."""
@@ -47,7 +47,7 @@ class Bartlett1932(Experiment):
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
-        self.max_bonus_amount=1.50
+        self.max_bonus_amount=1.75
         if session:
             self.setup()
 

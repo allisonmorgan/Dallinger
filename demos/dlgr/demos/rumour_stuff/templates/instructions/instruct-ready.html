@@ -35,11 +35,11 @@
           if (generation_size==1){
               var generation_text = 'a passage'
           } else if (generation_size==2){
-            var generation_text = 'two passages'
+            var generation_text = '<b>two passages</b>'
           } else if (generation_size==3){
-            var generation_text = 'three passages'
+            var generation_text = '<b>three passages</b>'
           } else{
-            var generation_text = 'four passages'
+            var generation_text = '<b>four passages</b>'
           }
           $('#begin-button').removeClass('disabled')
           $('#initial_paragraph').html('In this experiment, you will read ' + generation_text + ' of text. We will then ask you some questions about the text afterwards.')
