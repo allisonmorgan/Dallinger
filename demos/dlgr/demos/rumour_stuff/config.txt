@@ -4,12 +4,12 @@ auto_recruit = true
 loglevel = 0
 
 [MTurk]
-title = Psychology Experiment: Read stories and answer questions about them (<10 mins, bonus up to $1.75, no mobile please)
+title = Psychology Experiment: Read stories and answer questions about them (<6 mins, bonus up to $1.00, no mobile please)
 description = Read stories and answer questions about them.
 keywords = psychology, reading, text
-base_payment = 1.25
+base_payment = 1.00
 lifetime = 24
-duration = 0.5
+duration = 0.4
 us_only = true
 approve_requirement = 99
 contact_email_on_error = mdhardy@princeton.edu
@@ -25,7 +25,7 @@ database_size = standard-2
 
 [Server]
 dyno_type = standard-2x
-num_dynos_web = 2
-num_dynos_worker = 2
+num_dynos_web = 3
+num_dynos_worker = 3
 host = 0.0.0.0
 clock_on = false

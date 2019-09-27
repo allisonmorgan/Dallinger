@@ -1,7 +1,7 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
 import logging
-import pysnooper
+#import pysnooper
 import ast
 import random
 
@@ -28,7 +28,7 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':2
+        'generation_size':1
         }
 
     """Define the structure of the experiment."""
@@ -42,11 +42,11 @@ class Bartlett1932(Experiment):
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
-        self.num_replications = 2
+        self.num_replications = 10
         self.models = models
         self.generation_size = self.public_properties['generation_size']
         self.initial_recruitment_size = self.num_replications*self.generation_size
-        self.generations = 3
+        self.generations = 5
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
@@ -215,14 +215,14 @@ class Bartlett1932(Experiment):
 
         return chosen_network
 
-    @pysnooper.snoop(prefix = "@snoop: ")
+    #@pysnooper.snoop(prefix = "@snoop: ")
     def get_network_for_new_participant(self, participant):
         #key = "experiment.py >> get_network_for_new_participant ({}); ".format(participant.id)
 
         available_networks = self.models.ParticleFilter.query.filter_by(full = False).filter(self.models.ParticleFilter.property4 == repr(0)).all()
 
-        first_network = available_networks[0].property5
-        second_network = available_networks[1].property5
+        #first_network = available_networks[0].property5
+        #second_network = available_networks[1].property5
 
 
         #occupancy_counts = (

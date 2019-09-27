@@ -1,6 +1,7 @@
-var my_node_id,curr_generation
+var my_node_id,curr_generation, replication
+
 var running_total_pay = 0;
-var button_timeout = 0 // milliseconds before participant can move on after reading story
+var button_timeout = 20000//20000 // milliseconds before participant can move on after reading story
 var loading_timeout = 500 // miliseconds next story is loaded (including the timeout smooths the loading process) 
 
 // Consent to the experiment.
@@ -27,6 +28,7 @@ $(document).ready(function() {
     var contents = {
       response: response,
       generation: curr_generation,
+      replication: replication,
       participant_id: dallinger.identity.participantId
     }
 
@@ -129,6 +131,8 @@ var create_agent = function() {
       //a = resp;
       my_node_id = resp.node.id;
       curr_generation = parseInt(resp.node.property3);
+      replication = parseInt(resp.node.property5);
+      //console.log(replication)
     
       dallinger.getExperimentProperty('generation_size')
         .done(function (propertiesResp) {
