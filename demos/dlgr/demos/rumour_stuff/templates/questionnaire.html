@@ -203,11 +203,9 @@
   <script type="text/javascript">
     $(document).ready(function () {
       $("#submit-questionnaire").click(function() {
+        $("#submit-questionnaire").addClass('disabled')
         dallinger.submitQuestionnaire();
       });
     });
   </script>
 {% endblock %}
-
-
-"experiment.py >> recruit" OR "experiment.py >> clone_participant" OR "experiment.py >> submission_successful:" OR "experiment.py >> rollover_generation:"

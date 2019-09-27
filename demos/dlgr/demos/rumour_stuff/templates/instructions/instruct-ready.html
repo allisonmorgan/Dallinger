@@ -47,6 +47,7 @@
           $('#instruct_ready_div').css('display','block')
 
           $('#begin-button').on('click',function(){
+            $('#begin-button').addClass('disabled')
             dallinger.goToPage('exp')
           })
 

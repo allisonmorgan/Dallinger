@@ -1,7 +1,7 @@
-var my_node_id,curr_generation, replication
+var my_node_id,curr_generation, replication, read_multiple_versions
 
 var running_total_pay = 0;
-var button_timeout = 20000//20000 // milliseconds before participant can move on after reading story
+var button_timeout = 20000 // 20000//20000 // milliseconds before participant can move on after reading story
 var loading_timeout = 500 // miliseconds next story is loaded (including the timeout smooths the loading process) 
 
 // Consent to the experiment.
@@ -18,6 +18,7 @@ $(document).ready(function() {
   });*/
 
   $("#submit-response").click(function() {
+    $("#reproduction").prop('disabled', true);
     $("#submit-response").addClass('disabled');
     $("#submit-response").html('Sending...');
 
@@ -29,9 +30,9 @@ $(document).ready(function() {
       response: response,
       generation: curr_generation,
       replication: replication,
-      participant_id: dallinger.identity.participantId
+      participant_id: dallinger.identity.participantId,
+      read_multiple_versions: read_multiple_versions
     }
-
     dallinger.createInfo(my_node_id, {
       contents: JSON.stringify(contents),
       info_type: 'Info'
@@ -65,8 +66,11 @@ function update_story_html(story_html,curr_story,total_stories){
   if (curr_generation==0 && curr_story>1){
     var h1_addition = ' (even if the same as the previous text):'
     var curr_story_text = story_html[0].contents
-  } else{
+  } else if (curr_story==1){
     var h1_addition = ':'
+    var curr_story_text = story_html[0].contents
+  } else{
+    var h1_addition = ' (even if similar to the previous text):'
     var curr_story_text = story_html[curr_story-1].contents
   }
   $('#header-text').html('Read the ' +story_str+ ' text' + h1_addition)
@@ -97,6 +101,7 @@ function update_story_html(story_html,curr_story,total_stories){
     $("#finish-reading").html("I'm done reading the story");
     if (curr_story==total_stories){
       $("#finish-reading").click(function(){
+        $("#finish-reading").addClass('disabled')
         $('#trial_by_trial').css('margin-bottom','30px')
         $('#trial_info_1').html('Response page: <span>1 of 1</span>')
         $('#trial_info_2').css('display','none')
@@ -107,10 +112,10 @@ function update_story_html(story_html,curr_story,total_stories){
       })
     } else {
       $("#finish-reading").click(function(){
+        $("#finish-reading").addClass('disabled')
         $("#finish-reading").html("Please read for at least 20 seconds");
         $(window).scrollTop(0);
         $("#story").html('<b>Loading story ...</b>')
-        $("#finish-reading").addClass('disabled')
         $("#finish-reading").hide()
         $('#header-text').hide()
         $('#finish-reading').off('click');
@@ -137,20 +142,40 @@ var create_agent = function() {
       dallinger.getExperimentProperty('generation_size')
         .done(function (propertiesResp) {
           generation_size = propertiesResp.generation_size
+          dallinger.getExperimentProperty('read_multiple_versions')
+          .done(function(propertiesResp){
 
-          if (generation_size==1){
-            $('#response-header').html('Using the information you read in the text, reproduce the passage to the best of your ability.')
-          } else if (generation_size==2){
-            $('#response-header').html("<p id ='more-info'>These stories were two different MTurk workers' attempts to reproduce the same passage.</p><p>Using the information you read in the two texts, please reproduce the original passage to the best of your ability.</p>")
-          } else if (generation_size==3){
-            $('#response-header').html("<p id ='more-info'>These stories were three different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the three texts, please reproduce the original passage to the best of your ability.</p>")
-          } else{
-            $('#response-header').html("<p id ='more-info'>These stories were four different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the four texts, please reproduce the original passage to the best of your ability.</p>")
-          }
-          if (curr_generation==0){
-            $('#more-info').css('display','none')
-          }
-          get_info();
+            read_multiple_versions = propertiesResp.read_multiple_versions
+            if (curr_generation==0 && read_multiple_versions==0){
+              var num_stories_to_read = 1
+            } else{
+              var num_stories_to_read = generation_size
+            }      
+
+
+            if (num_stories_to_read==1){
+              $('#response-header').html('Using the information you read in the text, reproduce the passage to the best of your ability.')
+            } else if (num_stories_to_read==2){
+              $('#response-header').html("<p id ='more-info'>These stories were two different MTurk workers' attempts to reproduce the same passage.</p><p>Using the information you read in the two texts, please reproduce the original passage to the best of your ability.</p>")
+            } else if (num_stories_to_read==3){
+              $('#response-header').html("<p id ='more-info'>These stories were three different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the three texts, please reproduce the original passage to the best of your ability.</p>")
+            } else{
+              $('#response-header').html("<p id ='more-info'>These stories were four different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the four texts, please reproduce the original passage to the best of your ability.</p>")
+            }
+            if (curr_generation==0){
+              $('#more-info').css('display','none')
+            }
+            get_info(num_stories_to_read);
+          })
+          .fail(function (rejection) {
+            // A 403 is our signal that it's time to go to the questionnaire
+            if (rejection.status === 403) {
+              dallinger.allowExit();
+              dallinger.goToPage('questionnaire');
+            } else {
+              dallinger.error(rejection);
+            }
+          });
         })
         .fail(function (rejection) {
           // A 403 is our signal that it's time to go to the questionnaire
@@ -173,7 +198,7 @@ var create_agent = function() {
     });
 };
 
-var get_info = function() {
+var get_info = function(num_of_stories) {
   // Get info for node
   dallinger.getReceivedInfos(my_node_id)
     .done(function (resp) {
@@ -182,7 +207,7 @@ var get_info = function() {
       //console.log(num_stories)
 
       $("#finish-reading").addClass('disabled')
-      update_story_html(stories, 1, generation_size)
+      update_story_html(stories, 1, num_of_stories)
 
       $("#response-form").hide();
 

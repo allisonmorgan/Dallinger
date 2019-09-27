@@ -28,7 +28,8 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':1
+        'generation_size':3, # the width of the networks
+        'read_multiple_versions':0 # 0/1 for T/F of whether the initial generation should read multiple version of the same thing
         }
 
     """Define the structure of the experiment."""
@@ -42,7 +43,7 @@ class Bartlett1932(Experiment):
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
-        self.num_replications = 10
+        self.num_replications = 2
         self.models = models
         self.generation_size = self.public_properties['generation_size']
         self.initial_recruitment_size = self.num_replications*self.generation_size
@@ -51,6 +52,7 @@ class Bartlett1932(Experiment):
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
         self.max_bonus_amount=5
+        self.read_multiple_versions = self.public_properties['read_multiple_versions']
         if session:
             self.setup()
 
@@ -168,7 +170,7 @@ class Bartlett1932(Experiment):
             text_input[storyi])
             total_performance += curr_performance
         average_performance = total_performance/len(text_input)
-        if participant.nodes()[0].generation == 0:
+        if participant.nodes()[0].generation == 0 and self.read_multiple_versions==1:
             text_reward = (0.002 * len_text)*self.generation_size # read multiple versions of the same thing
         else:
             text_reward = (0.002 * len_text)
