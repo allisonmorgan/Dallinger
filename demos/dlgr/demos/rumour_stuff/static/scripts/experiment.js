@@ -31,7 +31,8 @@ $(document).ready(function() {
       generation: curr_generation,
       replication: replication,
       participant_id: dallinger.identity.participantId,
-      read_multiple_versions: read_multiple_versions
+      read_multiple_versions: read_multiple_versions,
+      generation_size:generation_size
     }
     dallinger.createInfo(my_node_id, {
       contents: JSON.stringify(contents),
