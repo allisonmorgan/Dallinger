@@ -20,12 +20,13 @@ class ParticleFilter(Network):
 
     __mapper_args__ = {"polymorphic_identity": "particlefilter"}
 
-    def __init__(self, generations, generation_size):
+    def __init__(self, generations, generation_size,replication):
         """Endow the network with some persistent properties."""
         self.property1 = repr(generations)
         self.property2 = repr(generation_size)
         self.max_size = generations * generation_size + 1 # add one to account for initial_source
         self.current_generation = 0
+        self.replication = replication
 
     @property
     def generations(self):
@@ -66,6 +67,22 @@ class ParticleFilter(Network):
     def decision_index(self):
         """Make decision_index queryable."""
         return cast(self.property4, Integer)
+
+    @hybrid_property
+    def replication(self):
+        """Make property3 replication."""
+        return int(self.property5)
+
+    @replication.setter
+    def replication(self, replication):
+        """Make replication settable."""
+        self.property5 = repr(replication)
+
+    @replication.expression
+    def replication(self):
+        """Make replication queryable."""
+        return cast(self.property5, Integer)
+
 
     # @pysnooper.snoop()
     def add_node(self, node):
@@ -113,8 +130,25 @@ class Particle(Node):
         """Make generation queryable."""
         return cast(self.property3, Integer)
 
-    def __init__(self, contents=None, details = None, network = None, participant = None):
+    @hybrid_property
+    def replication(self):
+        """Make property3 replication."""
+        return int(self.property5)
+
+    @replication.setter
+    def replication(self, replication):
+        """Make replication settable."""
+        self.property5 = repr(replication)
+
+    @replication.expression
+    def replication(self):
+        """Make replication queryable."""
+        return cast(self.property5, Integer)
+
+    def __init__(self, contents=None, details = None, network = None, participant = None,replication=None):
         super(Particle, self).__init__(network, participant)
+        self.replication = replication
+
 
 class WarOfTheGhostsSource(Source):
     """A Source that reads in a random story from a file and transmits it."""

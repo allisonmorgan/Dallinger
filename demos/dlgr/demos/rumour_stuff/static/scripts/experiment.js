@@ -1,4 +1,8 @@
 var my_node_id,curr_generation
+var running_total_pay = 0;
+var button_timeout = 0 // milliseconds before participant can move on after reading story
+var loading_timeout = 500 // miliseconds next story is loaded (including the timeout smooths the loading process) 
+
 // Consent to the experiment.
 $(document).ready(function() {
 
@@ -36,7 +40,13 @@ $(document).ready(function() {
 
 });
 
+function get_word_count(input_str){
+  return input_str.split(' ').length
+}
+
 function update_story_html(story_html,curr_story,total_stories){
+
+
   if (total_stories==1){
     var story_str = 'following'
   } else{
@@ -59,13 +69,22 @@ function update_story_html(story_html,curr_story,total_stories){
   }
   $('#header-text').html('Read the ' +story_str+ ' text' + h1_addition)
 
-  storyHTML = curr_story_text
+
+  var storyHTML = curr_story_text
 
   if (curr_generation==0){
-    var storyHTML = markdown.toHTML(curr_story_text)
+    storyHTML = markdown.toHTML(curr_story_text)
   } else{
-    var storyHTML = markdown.toHTML(JSON.parse(curr_story_text)['response'])
+    storyHTML = markdown.toHTML(JSON.parse(curr_story_text)['response'])
   }
+
+  $('#trial_info_1').html('Story page: <span>' + String(curr_story) + ' of ' + String(total_stories) + '</span>')
+  var word_count = get_word_count(storyHTML)
+  var curr_pay = roundTo(0.002*word_count,2)
+  running_total_pay = running_total_pay+curr_pay
+  $('#trial_info_2').html('Potential bonus earned from reading this story: <span>$' + curr_pay.toFixed(2) + '</span>')
+  $('#trial_info_3').html('Total potential bonus: <span>$' + running_total_pay.toFixed(2) + '</span>')
+
   $("#story").html(storyHTML);
   $("p").addClass("preventcopy");
   $("#stimulus").show();
@@ -76,6 +95,9 @@ function update_story_html(story_html,curr_story,total_stories){
     $("#finish-reading").html("I'm done reading the story");
     if (curr_story==total_stories){
       $("#finish-reading").click(function(){
+        $('#trial_by_trial').css('margin-bottom','30px')
+        $('#trial_info_1').html('Response page: <span>1 of 1</span>')
+        $('#trial_info_2').css('display','none')
         $("#stimulus").hide();
         $("#response-form").show();
         $("#submit-response").removeClass('disabled');
@@ -85,17 +107,17 @@ function update_story_html(story_html,curr_story,total_stories){
       $("#finish-reading").click(function(){
         $("#finish-reading").html("Please read for at least 20 seconds");
         $(window).scrollTop(0);
-        $("#story").html('&lt;&lt; loading &gt;&gt;')
+        $("#story").html('<b>Loading story ...</b>')
         $("#finish-reading").addClass('disabled')
         $("#finish-reading").hide()
         $('#header-text').hide()
         $('#finish-reading').off('click');
         setTimeout(function(){
           update_story_html(story_html,curr_story+1,total_stories)
-        },500)
+        },loading_timeout)
       })
     }
-  },20000)
+  },button_timeout)
 }
 
 // Create the agent.
@@ -104,13 +126,14 @@ var create_agent = function() {
   dallinger.createAgent()
     .done(function (resp) {
       $('#finish-reading').prop('disabled', false);
-      a = resp;
+      //a = resp;
       my_node_id = resp.node.id;
       curr_generation = parseInt(resp.node.property3);
     
       dallinger.getExperimentProperty('generation_size')
         .done(function (propertiesResp) {
           generation_size = propertiesResp.generation_size
+
           if (generation_size==1){
             $('#response-header').html('Using the information you read in the text, reproduce the passage to the best of your ability.')
           } else if (generation_size==2){
@@ -170,3 +193,14 @@ var get_info = function() {
       }
     });
 };
+
+function roundTo(n, digits) {
+  if (digits === undefined) {
+    digits = 0;
+  }
+
+  var multiplicator = Math.pow(10, digits);
+  n = parseFloat((n * multiplicator).toFixed(11));
+  var test =(Math.round(n) / multiplicator);
+  return +(test.toFixed(digits));
+}

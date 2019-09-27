@@ -6909,3 +6909,33 @@ button.close {
  #finish-reading{
      display:none;
  }
+
+ #trial_by_trial{
+     text-align:right;
+     margin-right:30px;
+     margin-bottom:20px;
+ }
+
+ .computer_number span {
+    font-family: Monaco, monospace;
+    line-height: 100%;
+    background-color: #eee;
+    padding: .2em;
+    letter-spacing: -.05em;
+    word-break: normal
+}
+
+#header-text{
+    margin-bottom:20px;
+}
+
+#experiment_debriefing{
+    margin-bottom:20px;
+    text-align:center;
+}
+
+#debriefing_text{
+    background-color: #f0f0f0;
+    padding:20px;
+    border-radius:20px;
+}

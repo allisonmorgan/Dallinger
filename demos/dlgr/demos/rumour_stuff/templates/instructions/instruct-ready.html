@@ -7,9 +7,10 @@
         <hr>
 
         <p id = 'initial_paragraph'></p>
-        <p>You will get an additional bonus based on the number of words that you will be assigned to read. 
-            This bonus will also be determined by your responses to the questions - the better your responses, the higher your bonus. 
-            Depending on how much you read and how accurate your responses are, you can earn a bonus of up to $1.50.
+        <p>Your potential bonus will be determined by the total number of words you are assigned to read - you receive a potential bonus of 1 cent for every 
+          five words you read. Your actual bonus will then be determined by your responses to the questions - the better your responses, 
+          the higher your received bonus, which can be as high as your potential bonus.</p>
+          <p>In the past, most MTurkers who complete the experiment received their full potential bonus. 
         </p>
         <hr>
 
@@ -17,7 +18,7 @@
             <div class="row">
                 <div class="col-xs-10"></div>
                 <div class="col-xs-2">
-                    <button type="button" id = 'begin-button' class="btn btn-success btn-lg" onClick="dallinger.allowExit(); dallinger.goToPage('exp');">
+                    <button type="button" id = 'begin-button' class="btn btn-success btn-lg">
                     Begin</button>
                 </div>
             </div>
@@ -35,15 +36,20 @@
           if (generation_size==1){
               var generation_text = 'a passage'
           } else if (generation_size==2){
-            var generation_text = '<b>two passages</b>'
+            var generation_text = 'two passages'
           } else if (generation_size==3){
-            var generation_text = '<b>three passages</b>'
+            var generation_text = 'three passages'
           } else{
-            var generation_text = '<b>four passages</b>'
+            var generation_text = 'four passages'
           }
           $('#begin-button').removeClass('disabled')
-          $('#initial_paragraph').html('In this experiment, you will read ' + generation_text + ' of text. We will then ask you some questions about the text afterwards.')
+          $('#initial_paragraph').html('In this experiment, you will read ' + generation_text + ' of text. We will then ask you some questions about what you read.')
           $('#instruct_ready_div').css('display','block')
+
+          $('#begin-button').on('click',function(){
+            dallinger.goToPage('exp')
+          })
+
         })
         .fail(function (rejection) {
           // A 403 is our signal that it's time to go to the questionnaire
@@ -51,6 +57,7 @@
             dallinger.allowExit();
             dallinger.goToPage('questionnaire');
           } else {
+            console.log('problem')
             dallinger.error(rejection);
           }
         });

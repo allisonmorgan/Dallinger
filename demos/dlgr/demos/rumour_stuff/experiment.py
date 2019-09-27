@@ -1,8 +1,9 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
 import logging
-#import pysnooper
+import pysnooper
 import ast
+import random
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
@@ -15,7 +16,7 @@ from dallinger.bots import BotBase
 from dallinger.config import get_config
 from dallinger.networks import Chain
 from dallinger.experiment import Experiment
-
+from dallinger import db
 
 logger = logging.getLogger(__file__)
 
@@ -27,7 +28,7 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':3
+        'generation_size':2
         }
 
     """Define the structure of the experiment."""
@@ -41,13 +42,15 @@ class Bartlett1932(Experiment):
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
+        self.num_replications = 2
         self.models = models
-        self.initial_recruitment_size = self.generation_size = self.public_properties['generation_size']
+        self.generation_size = self.public_properties['generation_size']
+        self.initial_recruitment_size = self.num_replications*self.generation_size
         self.generations = 3
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
-        self.max_bonus_amount=1.75
+        self.max_bonus_amount=5
         if session:
             self.setup()
 
@@ -55,27 +58,37 @@ class Bartlett1932(Experiment):
     def configure(self):
         config = get_config()
 
+    #@pysnooper.snoop(prefix = "@snoop SETUP: ")
     def setup(self):
         """Setup the networks"""
 
         """Create the networks if they don't already exist."""
         if not self.networks():
                 
-            for f in range(self.num_fixed_order_experimental_networks_per_experiment):
-                decision_index = f
-                network = self.create_network(role = 'experiment', decision_index = decision_index)
-                self.models.WarOfTheGhostsSource(network=network)
+            # make an outer loop for number of replications
+            #for replication_i in range(self.num_replications):
+            #    for decision_index in range(self.num_fixed_order_experimental_networks_per_experiment,replication_i):
+            #        network = self.create_network(role = 'experiment', decision_index = decision_index)
+            #        print('NETWORK HERE:',network)
+            #        self.models.WarOfTheGhostsSource(network=network)
+
+            for replication_i in range(self.num_replications):
+                for decision_i in range(self.num_fixed_order_experimental_networks_per_experiment):
+                    network = self.create_network(role='experiment',decision_index=decision_i,replication=replication_i)
+                    self.models.WarOfTheGhostsSource(network=network)
 
             self.session.commit()
 
     def create_node(self, network, participant):
-        return self.models.Particle(network=network,participant=participant)
+        return self.models.Particle(network=network,participant=participant, replication=network.replication)
 
-    def create_network(self, role, decision_index):
+    def create_network(self, role, decision_index,replication):
         """Return a new network."""
-        net = self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size)
+        # add argument for replication to particle filter in models.py
+        net = self.models.ParticleFilter(generations = self.generations, generation_size = self.generation_size,replication=replication)
         net.role = role
         net.decision_index = decision_index
+        #net.replication = replication
         self.session.add(net)
         return net
 
@@ -149,20 +162,19 @@ class Bartlett1932(Experiment):
         total_performance = 0
         len_text = 0
         for storyi in range(len(text_input)):
-            len_text += 2*len(str(text_input[storyi]).split(' '))
+            len_text += len(str(text_input[storyi]).split(' '))
             curr_performance = self.text_similarity(
             self.get_submitted_text(participant),
             text_input[storyi])
             total_performance += curr_performance
         average_performance = total_performance/len(text_input)
         if participant.nodes()[0].generation == 0:
-            text_reward = (0.001 * len_text)*self.generation_size # read multiple versions of the same thing
+            text_reward = (0.002 * len_text)*self.generation_size # read multiple versions of the same thing
         else:
-            text_reward = (0.001 * len_text)
-        payout = round(self.bonus_amount * text_reward , 2)
-        #print("Payout:",payout)
+            text_reward = (0.002 * len_text)
+        payout = round(text_reward , 2)
         if average_performance <= 0.015:
-            return round(self.max_bonus_amount/4,2)
+            return min(round(payout/4,2),self.max_bonus_amount)
         else:
             return min(payout, self.max_bonus_amount)
 
@@ -203,12 +215,92 @@ class Bartlett1932(Experiment):
 
         return chosen_network
 
-    # #@pysnooper.snoop(prefix = "@snoop: ")
+    @pysnooper.snoop(prefix = "@snoop: ")
     def get_network_for_new_participant(self, participant):
-        key = "experiment.py >> get_network_for_new_participant ({}); ".format(participant.id)
+        #key = "experiment.py >> get_network_for_new_participant ({}); ".format(participant.id)
 
-        # Return first-trial networks
-        return self.models.ParticleFilter.query.filter_by(full = False).filter(self.models.ParticleFilter.property4 == repr(0)).one_or_none()
+        available_networks = self.models.ParticleFilter.query.filter_by(full = False).filter(self.models.ParticleFilter.property4 == repr(0)).all()
+
+        first_network = available_networks[0].property5
+        second_network = available_networks[1].property5
+
+
+        #occupancy_counts = (
+        #    db.session.query(
+        #    func.count(self.models.Particle.participant_id.distinct()).label('count'), self.models.ParticleFilter.property5)
+        #    .join(self.models.ParticleFilter)
+        #    .join(self.models.Participant)
+        #    .group_by(self.models.ParticleFilter.property5)  
+        #    .filter_by(failed = False)
+        #    .filter(self.models.ParticleFilter.property4 == repr(0))
+        #     .filter(self.models.Participant.status == "approved")
+        #).all()
+
+        #second_thing = (
+        #    db.session.query(
+        #        func.count(self.models.Particle.participant_id.distinct()).label('count'), self.models.ParticleFilter.property5, self.models.Participant.status)
+        #        .join(self.models.ParticleFilter)
+        #        .group_by(self.models.ParticleFilter.property5, self.models.Participant.status)  
+        #        .filter_by(failed = False)
+        #        .filter(self.models.ParticleFilter.property4 == repr(0))
+        #).all()
+
+        #third_thing =   (
+        #    db.session.query(
+        #    func.count(self.models.Particle.participant_id.distinct()).label('count'), self.models.ParticleFilter.property5, self.models.Participant.status)
+        #    .join(self.models.ParticleFilter)
+        #    .join(self.models.Participant)
+        #    .group_by(self.models.ParticleFilter.property5, self.models.Participant.status)  
+        #    .filter_by(failed = False)
+        #    .filter(self.models.ParticleFilter.property4 == repr(0))
+        #).all()
+
+        occupancy_counts = (
+            db.session.query(
+            func.count(self.models.Particle.participant_id.distinct()).label('count'), self.models.ParticleFilter.property5)
+            .join(self.models.ParticleFilter)
+            .join(self.models.Participant)
+            .group_by(self.models.ParticleFilter.property5)  
+            .filter_by(failed = False)
+            .filter(self.models.ParticleFilter.property4 == repr(0))
+             .filter(self.models.Participant.status.in_(["approved", "working", "submitted"]))
+        ).all()
+
+        if len(occupancy_counts)>=1:
+            if len(occupancy_counts)==self.num_replications:
+                min_val = 10000 # whole thing is hacky, but can make cleaner later
+                min_val_list = []
+                for replication_i in range(len(occupancy_counts)):
+                    curr_val = occupancy_counts[replication_i][0]
+                    if curr_val<min_val:
+                        min_val_list = [int(occupancy_counts[replication_i][1])] # append with the replication int
+                        min_val=curr_val
+                    elif curr_val==min_val:
+                        min_val_list.append(int(occupancy_counts[replication_i][1]))
+            elif len(occupancy_counts)<self.num_replications: # in initial generation here,
+                curr_generation_list = list(range(0,self.num_replications))
+                for replication_i in range(len(occupancy_counts)):
+                    curr_replication = int(occupancy_counts[replication_i][1])
+                    curr_generation_list.remove(curr_replication)
+                min_val_list = curr_generation_list
+        else:
+            min_val_list = list(range(0,self.num_replications))
+
+        current_replication = random.choice(min_val_list)
+
+
+        #random_choice_list = []
+        #for replication_i in range(len(occupancy_counts)):
+        #    curr_in_replication = occupancy_counts[replication_i][0]
+        #    curr_remaining = num_allowed-curr_in_replication
+        #    curr_list = [replication_i]*curr_remaining
+        #    random_choice_list = random_choice_list+curr_list
+
+        #print('OCCUPANCY COUNTS:',occupancy_counts)
+        #print("RANDOM CHOICE LIST",random_choice_list)
+        #print("RANDOM CHOICE",random.choice(random_choice_list))
+        # nothing to stop this giving them both replication 0
+        return available_networks[current_replication]
 
     #@pysnooper.snoop()
     def get_network_for_participant(self, participant):
@@ -252,9 +344,9 @@ class Bartlett1932(Experiment):
                                                                             self.models.Particle.participant_id.in_(completed_participant_ids)) \
                                                                         .count() 
 
-            if completed_nodes_this_generation == self.generation_size:
+            if completed_nodes_this_generation == self.generation_size*self.num_replications:
                 self.rollover_generation()
-                self.recruiter.recruit(n=self.generation_size)
+                self.recruiter.recruit(n=self.generation_size*self.num_replications)
 
         else:
             self.recruiter.close_recruitment()
