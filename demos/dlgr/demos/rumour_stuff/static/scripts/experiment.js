@@ -1,7 +1,7 @@
 var my_node_id,curr_generation, replication, read_multiple_versions
 
 var running_total_pay = 0;
-var button_timeout = 15000 // 20000//20000 // milliseconds before participant can move on after reading story
+var button_timeout = 20000 // 20000//20000 // milliseconds before participant can move on after reading story
 var loading_timeout = 500 // miliseconds next story is loaded (including the timeout smooths the loading process) 
 
 // Consent to the experiment.
