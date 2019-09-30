@@ -29,7 +29,7 @@ class Bartlett1932(Experiment):
     def public_properties(self):
         return {
         'generation_size':3, # the width of the networks
-        'read_multiple_versions':0 # 0/1 for T/F of whether the initial generation should read multiple version of the same thing
+        'read_multiple_versions':0 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
         }
 
     """Define the structure of the experiment."""
@@ -43,7 +43,7 @@ class Bartlett1932(Experiment):
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
-        self.num_replications = 2
+        self.num_replications = 5
         self.models = models
         self.generation_size = self.public_properties['generation_size']
         self.initial_recruitment_size = self.num_replications*self.generation_size
@@ -265,7 +265,7 @@ class Bartlett1932(Experiment):
             .group_by(self.models.ParticleFilter.property5)  
             .filter_by(failed = False)
             .filter(self.models.ParticleFilter.property4 == repr(0))
-             .filter(self.models.Participant.status.in_(["approved", "working", "submitted"]))
+            .filter(self.models.Participant.status.in_(["approved", "working", "submitted"]))
         ).all()
 
         if len(occupancy_counts)>=1:

@@ -4,15 +4,15 @@ import os
 
 # converts the info table to a csv where the column names are the dictionary keys in the parsed contents column
 
-old_filename = 'data/pilot1_sept16/pilot1_3by3.csv' # the filename of the uncleaned info.csv file
-new_filename = 'data/pilot1_sept16/pilot1_3by3_cleaned.csv' # the cleaned pilot data filename
+old_filename = 'data/pilot1x10_sept_27/info_uncleaned.csv' # the filename of the uncleaned info.csv file
+new_filename = 'data/pilot1x10_sept_27/info_cleaned.csv' # the cleaned pilot data filename
 
 os.chdir('/Users/mhardy/Documents/princeton_research/rumor_study/Dallinger/demos/dlgr/demos/rumour_stuff/data_analysis')
 
 first_loop=True
 data = pd.read_csv(old_filename)
 for index,row in data.iterrows():
-    if row['type']=='info' and row['origin_id']!=1 and row['failed']=='f': # only want certain rows
+    if row['type']=='info' and row['origin_id']!=1 and row['failed']=='f' and row['contents'][0]=='{': # only want certain rows
         curr_json = json.loads(row['contents'])
         if first_loop: # get names of dictionary keys in contents and turn these into a list
             col_names = []

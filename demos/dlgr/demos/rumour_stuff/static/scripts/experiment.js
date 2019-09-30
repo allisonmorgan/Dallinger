@@ -1,7 +1,7 @@
 var my_node_id,curr_generation, replication, read_multiple_versions
 
 var running_total_pay = 0;
-var button_timeout = 20000 // 20000//20000 // milliseconds before participant can move on after reading story
+var button_timeout = 15000 // 20000//20000 // milliseconds before participant can move on after reading story
 var loading_timeout = 500 // miliseconds next story is loaded (including the timeout smooths the loading process) 
 
 // Consent to the experiment.
@@ -157,11 +157,11 @@ var create_agent = function() {
             if (num_stories_to_read==1){
               $('#response-header').html('Using the information you read in the text, reproduce the passage to the best of your ability.')
             } else if (num_stories_to_read==2){
-              $('#response-header').html("<p id ='more-info'>These stories were two different MTurk workers' attempts to reproduce the same passage.</p><p>Using the information you read in the two texts, please reproduce the original passage to the best of your ability.</p>")
+              $('#response-header').html("<p id ='more-info'>These stories were two different MTurk workers' attempts to reproduce the same passage.</p><p>Using the information you read in the two texts, please reproduce this passage to the best of your ability.</p>")
             } else if (num_stories_to_read==3){
-              $('#response-header').html("<p id ='more-info'>These stories were three different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the three texts, please reproduce the original passage to the best of your ability.</p>")
+              $('#response-header').html("<p id ='more-info'>These stories were three different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the three texts, please reproduce this passage to the best of your ability.</p>")
             } else{
-              $('#response-header').html("<p id ='more-info'>These stories were four different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the four texts, please reproduce the original passage to the best of your ability.</p>")
+              $('#response-header').html("<p id ='more-info'>These stories were four different MTurk workers'' attempts to reproduce the same passage.</p><p>Using the information you read in the four texts, please reproduce this passage to the best of your ability.</p>")
             }
             if (curr_generation==0){
               $('#more-info').css('display','none')

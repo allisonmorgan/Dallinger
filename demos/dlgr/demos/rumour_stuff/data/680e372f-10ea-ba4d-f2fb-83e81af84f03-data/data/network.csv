@@ -1,0 +1,11 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,type,max_size,full,role
+6,2019-09-27 15:15:59.290606,5,1,4,0,5,f,,{},particlefilter,6,t,experiment
+5,2019-09-27 15:15:59.282475,5,1,4,0,4,f,,{},particlefilter,6,f,experiment
+2,2019-09-27 15:15:59.234666,5,1,4,0,1,f,,{},particlefilter,6,t,experiment
+1,2019-09-27 15:15:59.215001,5,1,4,0,0,f,,{},particlefilter,6,t,experiment
+3,2019-09-27 15:15:59.251342,5,1,4,0,2,f,,{},particlefilter,6,t,experiment
+8,2019-09-27 15:15:59.309348,5,1,4,0,7,f,,{},particlefilter,6,t,experiment
+10,2019-09-27 15:15:59.333119,5,1,4,0,9,f,,{},particlefilter,6,f,experiment
+9,2019-09-27 15:15:59.318301,5,1,4,0,8,f,,{},particlefilter,6,t,experiment
+4,2019-09-27 15:15:59.27106,5,1,4,0,3,f,,{},particlefilter,6,f,experiment
+7,2019-09-27 15:15:59.298568,5,1,4,0,6,f,,{},particlefilter,6,t,experiment
