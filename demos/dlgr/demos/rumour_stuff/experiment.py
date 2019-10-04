@@ -28,7 +28,7 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':2, # the width of the networks
+        'generation_size':40, # the width of the networks
         'read_multiple_versions':1 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
         }
 
