@@ -28,7 +28,7 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':40, # the width of the networks
+        'generation_size':30, # the width of the networks
         'read_multiple_versions':1 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
         }
 
@@ -171,7 +171,7 @@ class Bartlett1932(Experiment):
             total_performance += curr_performance
         average_performance = total_performance/len(text_input)
         if participant.nodes()[0].generation == 0 and self.read_multiple_versions==1:
-            text_reward = (0.001 * len_text)*self.generation_size # read multiple versions of the same thing
+            text_reward = (0.001 * len_text)*3 # read multiple versions of the same thing
         else:
             text_reward = (0.001 * len_text)
         payout = round(text_reward , 2)
