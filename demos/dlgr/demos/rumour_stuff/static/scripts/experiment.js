@@ -87,7 +87,7 @@ function update_story_html(story_html,curr_story,total_stories){
 
   $('#trial_info_1').html('Story page: <span>' + String(curr_story) + ' of ' + String(total_stories) + '</span>')
   var word_count = get_word_count(storyHTML)
-  var curr_pay = roundTo(0.002*word_count,2)
+  var curr_pay = roundTo(0.001*word_count,2)
   running_total_pay = running_total_pay+curr_pay
   $('#trial_info_2').html('Potential bonus earned from reading this story: <span>$' + curr_pay.toFixed(2) + '</span>')
   $('#trial_info_3').html('Total potential bonus: <span>$' + running_total_pay.toFixed(2) + '</span>')
@@ -151,7 +151,10 @@ var create_agent = function() {
               var num_stories_to_read = 1
             } else{
               var num_stories_to_read = generation_size
-            }      
+            }
+            
+            // undo this later
+            num_stories_to_read = 3
 
 
             if (num_stories_to_read==1){

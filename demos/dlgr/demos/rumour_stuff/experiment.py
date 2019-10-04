@@ -28,8 +28,8 @@ class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':3, # the width of the networks
-        'read_multiple_versions':0 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
+        'generation_size':2, # the width of the networks
+        'read_multiple_versions':1 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
         }
 
     """Define the structure of the experiment."""
@@ -43,11 +43,11 @@ class Bartlett1932(Experiment):
         super(Bartlett1932, self).__init__(session)
         from . import models  # Import at runtime to avoid SQLAlchemy warnings
 
-        self.num_replications = 5
+        self.num_replications = 1
         self.models = models
         self.generation_size = self.public_properties['generation_size']
         self.initial_recruitment_size = self.num_replications*self.generation_size
-        self.generations = 5
+        self.generations = 1
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
@@ -171,9 +171,9 @@ class Bartlett1932(Experiment):
             total_performance += curr_performance
         average_performance = total_performance/len(text_input)
         if participant.nodes()[0].generation == 0 and self.read_multiple_versions==1:
-            text_reward = (0.002 * len_text)*self.generation_size # read multiple versions of the same thing
+            text_reward = (0.001 * len_text)*self.generation_size # read multiple versions of the same thing
         else:
-            text_reward = (0.002 * len_text)
+            text_reward = (0.001 * len_text)
         payout = round(text_reward , 2)
         if average_performance <= 0.015:
             return min(round(payout/4,2),self.max_bonus_amount)

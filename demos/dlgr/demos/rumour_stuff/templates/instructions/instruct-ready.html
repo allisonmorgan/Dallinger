@@ -8,7 +8,7 @@
 
         <p id = 'initial_paragraph'></p>
         <p>Your potential bonus will be determined by the total number of words you are assigned to read - you receive a potential bonus of 1 cent for every 
-          five words you read. Your actual bonus will then be determined by your responses to the questions - the better your responses, 
+          ten words you read. Your actual bonus will then be determined by your responses to the questions - the better your responses, 
           the higher your received bonus, which can be as high as your potential bonus.</p>
           <p>In the past, most MTurkers who complete the experiment received their full potential bonus. 
         </p>
@@ -32,7 +32,8 @@
         dallinger.createParticipant();
         dallinger.getExperimentProperty('generation_size')
         .done(function (propertiesResp) {
-          generation_size = propertiesResp.generation_size
+          //generation_size = propertiesResp.generation_size
+          generation_size=3
           if (generation_size==1){
               var generation_text = 'a passage'
           } else if (generation_size==2){
