@@ -1,6 +1,0 @@
-id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,details,type,max_size,full,role
-2,2019-09-30 14:12:55.395157,5,3,4,0,1,f,,{},particlefilter,16,f,experiment
-4,2019-09-30 14:12:55.420532,5,3,4,0,3,f,,{},particlefilter,16,t,experiment
-3,2019-09-30 14:12:55.406555,5,3,4,0,2,f,,{},particlefilter,16,t,experiment
-1,2019-09-30 14:12:55.379492,5,3,4,0,0,f,,{},particlefilter,16,t,experiment
-5,2019-09-30 14:12:55.434182,5,3,4,0,4,f,,{},particlefilter,16,t,experiment
