@@ -24,11 +24,12 @@ logger = logging.getLogger(__file__)
 # bonus calculation not working correctly ... I think these may be related
 
 
+
 class Bartlett1932(Experiment):
     @property
     def public_properties(self):
         return {
-        'generation_size':30, # the width of the networks
+        'generation_size':40, # the width of the networks
         'read_multiple_versions':1 # 0/1 for F/T of whether the initial generation should read multiple version of the same thing
         }
 
@@ -51,7 +52,7 @@ class Bartlett1932(Experiment):
         self.num_experimental_networks_per_experiment = 1
         self.num_fixed_order_experimental_networks_per_experiment = 1
         self.bonus_amount=1 # 1 for activating the extra bonus, 0 for deactivating it
-        self.max_bonus_amount=5
+        self.max_bonus_amount=1.47
         self.read_multiple_versions = self.public_properties['read_multiple_versions']
         if session:
             self.setup()
@@ -140,7 +141,7 @@ class Bartlett1932(Experiment):
             total_performance += curr_performance
         average_performance = total_performance /  num_read_text
         #print("AVERAGE PERFORMANCE:",average_performance)  
-        return ( 0.015 <= average_performance <= 0.8)
+        return ( 0.02 <= average_performance <= 0.8)
         
 
     def text_similarity(self, one, two):
@@ -175,8 +176,8 @@ class Bartlett1932(Experiment):
         else:
             text_reward = (0.001 * len_text)
         payout = round(text_reward , 2)
-        if average_performance <= 0.015:
-            return min(round(payout/4,2),self.max_bonus_amount)
+        if average_performance <= 0.02:
+            return min(round(payout/4,2),round(self.max_bonus_amount/4,2))
         else:
             return min(payout, self.max_bonus_amount)
 
