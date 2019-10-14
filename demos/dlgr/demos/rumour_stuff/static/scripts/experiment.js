@@ -33,7 +33,7 @@ $(document).ready(function() {
       participant_id: dallinger.identity.participantId,
       read_multiple_versions: read_multiple_versions,
       generation_size:generation_size,
-      num_times_read: 3
+      num_times_read: 1
     }
     dallinger.createInfo(my_node_id, {
       contents: JSON.stringify(contents),
@@ -155,7 +155,7 @@ var create_agent = function() {
             }
             
             // undo this later
-            num_stories_to_read = 3
+            num_stories_to_read = 1
 
 
             if (num_stories_to_read==1){
