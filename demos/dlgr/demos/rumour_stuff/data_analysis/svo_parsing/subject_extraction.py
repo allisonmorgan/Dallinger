@@ -36,8 +36,7 @@ VERBS = ['VB', 'VBG', 'VBD', 'VBN', 'VBP', 'VBZ']
 
 def clean_document(document):
     """Remove enronious characters. Extra whitespace and stop words"""
-    document = re.sub('[^A-Za-z .-]+', ' ', document)
-    document = re.sub(r'\.', ' . ', document)
+    document = re.sub('[^A-Za-z0-9\' .-]+', ' ', document)
     document = ' '.join(document.split())
     # document = ' '.join([i for i in document.split() if i not in stop])
     return document
@@ -85,14 +84,14 @@ def extract_subject(document):
     return most_freq_nouns
     # return subject_nouns
 
-def trained_tagger(existing=False):
+def trained_tagger(existing=True):
     """Returns a trained trigram tagger
 
     existing : set to True if already trained tagger has been pickled
     """
     current_loc = os.path.dirname(__file__)
     if existing:
-        trigram_tagger = pickle.load(open(os.path.join(current_loc, './trained_tagger.pkl'), 'rb'))
+        trigram_tagger = pickle.load(open(os.path.join(current_loc, 'trained_tagger.pkl'), 'rb'))
         return trigram_tagger
 
     # Aggregate trained sentences for N-Gram Taggers
@@ -102,13 +101,13 @@ def trained_tagger(existing=False):
 
     # Create instance of SubjectTrigramTagger and persist instance of it
     trigram_tagger = SubjectTrigramTagger(train_sents)
-    pickle.dump(trigram_tagger, open(os.path.join(current_loc, './trained_tagger.pkl'), 'wb'))
+    pickle.dump(trigram_tagger, open(os.path.join(current_loc, 'trained_tagger.pkl'), 'wb'))
 
     return trigram_tagger
 
 def tag_sentences(subject, document):
     """Returns tagged sentences using POS tagging"""
-    trigram_tagger = trained_tagger(existing=True)
+    trigram_tagger = trained_tagger()
 
     # Tokenize Sentences and words
     sentences = tokenize_sentences(document)
